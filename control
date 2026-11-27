@@ -1,8 +1,8 @@
 Package: local.selectblocks
 Name: SelectBlocks (Experimental)
-Version: 0.2.0
+Version: 0.3.0
 Architecture: iphoneos-arm64
-Description: Native-style controls, animated presentation and original retro block textures. Experimental rootless tweak.
+Description: Retro HUD and controls, selected-word entrance animation and multilingual triggers. Experimental rootless tweak.
 Maintainer: Local Build
 Author: Local Build
 Section: Tweaks

@@ -5,6 +5,8 @@ on:
     paths:
       - '**.xm'
       - '**.h'
+      - '**.json'
+      - 'tests/**'
       - Makefile
       - control
       - SelectBlocks.plist
@@ -23,6 +25,11 @@ jobs:
         run: |
           cc -std=c11 -O2 -Wall -Wextra tests/test_game.c -o "$RUNNER_TEMP/selectblocks-test"
           "$RUNNER_TEMP/selectblocks-test"
+      - name: Test multilingual triggers
+        run: |
+          node tests/test_selection.js
+          clang -fobjc-arc -framework Foundation tests/test_triggers.m -o "$RUNNER_TEMP/selectblocks-triggers"
+          "$RUNNER_TEMP/selectblocks-triggers"
       - name: Install build tools
         run: |
           brew list --versions make >/dev/null || brew install make
@@ -55,4 +62,4 @@ jobs:
             --target "$GITHUB_SHA" \
             --prerelease \
             --title "SelectBlocks ${VERSION} — experimental build ${GITHUB_RUN_NUMBER}" \
-            --notes "Экспериментальный rootless-твик для iOS 16. Версия 0.2: нативные кнопки снизу, выделенный сброс, анимация появления с поддержкой Reduce Motion, надпись TETRIS и процедурные объёмные текстуры блоков. Скачивайте файл .deb из Assets. Сборка не означает проверку работы на iPhone: нативный интерфейс и совместимость с устройством не протестированы. Поддержка выделения зависит от приложения; возможны сбои. Перед установкой убедитесь, что умеете запускать jailbreak без инъекции твиков для удаления пакета. Исходники и ограничения: README-RU.txt в репозитории."
+            --notes "Экспериментальный rootless-твик для iOS 16. Версия 0.3: служебные кнопки наверху, движение и повороты снизу, ретро-счётчики и кнопки, перелёт распознанного слова к заголовку, многоязычные названия. При неизвестных координатах или Reduce Motion используется затухание. Скачивайте файл .deb из Assets. Сборка не означает проверку работы на iPhone: нативный интерфейс и совместимость с устройством не протестированы. Поддержка выделения зависит от приложения; возможны сбои. Перед установкой убедитесь, что умеете запускать jailbreak без инъекции твиков для удаления пакета. Исходники и ограничения: README-RU.txt в репозитории."
