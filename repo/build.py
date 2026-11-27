@@ -71,7 +71,7 @@ def png_icon(size=128):
     return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('!2I5B', size, size, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(b''.join(rows))) + chunk(b'IEND', b'')
 
 
-def write_channel(folder, variant, deb, meta, source_url):
+def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
     validate_metadata(meta, variant)
     folder.mkdir(parents=True, exist_ok=True)
     pool = folder / 'pool'
@@ -89,7 +89,7 @@ def write_channel(folder, variant, deb, meta, source_url):
         'MD5sum': hashlib.md5(data).hexdigest(),
         'SHA256': hashlib.sha256(data).hexdigest(),
         'SHA512': hashlib.sha512(data).hexdigest(),
-        'Depiction': source_url,
+        'Depiction': depiction_url or source_url,
         'Icon': source_url + 'CydiaIcon.png',
     })
     package_data = ('\n'.join(k + ': ' + v for k, v in record.items()) + '\n\n').encode()
@@ -137,7 +137,8 @@ def main():
     if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', args.repository):
         raise ValueError('Invalid repository name')
     owner, repo = args.repository.split('/')
-    base_url = (args.base_url or 'https://' + owner.lower() + '.github.io/' + repo + '/').rstrip('/') + '/'
+    base_url = (args.base_url or 'https://raw.githubusercontent.com/' + owner.lower() + '/' + repo.lower() + '/apt/').rstrip('/') + '/'
+    web_url = 'https://' + owner.lower() + '.github.io/' + repo + '/'
     if not base_url.startswith('https://'):
         raise ValueError('The public APT URL must use HTTPS')
     release = json.loads(subprocess.check_output(['gh', 'api', 'repos/' + args.repository + '/releases/latest'], text=True))
@@ -176,7 +177,7 @@ def main():
             subprocess.run(['dpkg-deb', '--contents', str(deb)], check=True, stdout=subprocess.DEVNULL)
             suffix = CHANNELS[variant]['path']
             source_url = base_url + (suffix + '/' if suffix else '')
-            entries.append(write_channel(out / suffix, variant, deb, meta, source_url))
+            entries.append(write_channel(out / suffix, variant, deb, meta, source_url, web_url + (suffix + '/' if suffix else '')))
     if len(versions) != 1:
         raise ValueError('Refusing to mix different versions across release variants')
     config = {'repository': 'https://github.com/' + args.repository, 'release': release['html_url'], 'version': next(iter(versions)), 'base': base_url, 'entries': entries, 'signed': False}

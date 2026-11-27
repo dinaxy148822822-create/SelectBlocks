@@ -1,3 +1,18 @@
+# Direct source / Прямой источник
+
+Чтобы исключить зависимость APT от маршрутов GitHub Pages, добавлено зеркало в отдельной ветке `apt`.
+
+Rootless:
+`https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/`
+
+Rootful: тот же адрес с `rootful/` в конце. Legacy: с `legacy/`.
+
+Адрес заработает после успешного шага **Publish direct APT mirror and verify live package bytes**. Файл `repository-health.md` в ветке `apt` содержит реальные результаты проверки HTTP и SHA256 для индексов и DEB. Проверяется также User-Agent Sileo. Зелёная сборка без этих проверок не считается подтверждением доступности пакетов.
+
+English: the dedicated `apt` branch provides a direct source independent of GitHub Pages routing. The URL becomes available after the live verification step succeeds. See `repository-health.md` on that branch for actual HTTP and SHA256 checks. Metadata remains unsigned; never disable APT security checks globally.
+
+---
+
 # Sileo / Zebra APT source · APT-источник
 
 ## Русский
@@ -19,7 +34,7 @@
 
 Откройте страницу на iPhone, выберите свой вариант и нажмите Sileo или Zebra. Либо вручную добавьте соответствующий адрес в «Источники». Не добавляйте все варианты одновременно. Сам адрес github.com — это исходники, а не APT-источник.
 
-Источник содержит только реальные DEB последнего обычного релиза. При новом релизе или успешном Build DEB он обновляется автоматич��ски; предусмотрены ручной и ежедневный запуск. Требования iOS берутся из пакета. Rootless и rootful не взаимозаменяемы.
+Источник содержит только реальные DEB последнего обычного релиза. При новом релизе или успешном Build DEB он обновляется автоматически; предусмотрены ручной и ежедневный запуск. Требования iOS берутся из пакета. Rootless и rootful не взаимозаменяемы.
 
 **Безопасность:** индексы содержат SHA-256/SHA-512 и размещаются по HTTPS, но пока не подписаны GPG. Это не замена криптографической подписи. Не отключайте проверки APT глобально. Если политика вашего клиента требует подпись, этот источник пока не подходит.
 
