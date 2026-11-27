@@ -16,21 +16,3 @@ SHA512: d9f3e1873f1b775216f8a7ba02c90b44bbb3bc857a214d7907cdf698d08c1e044f2e8f4d
 Depiction: https://dinaxy148822822-create.github.io/SelectBlocks/
 Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/package-icon-290af1fe6368.png
 
-Package: local.wifipilot
-Name: WiFiPilot (Experimental)
-Description: Experimental saved-network switcher with diagnostics, manual tests and opt-in RSSI automation. Rootless iOS 16 only; device testing required.
-Maintainer: WiFiPilot contributors
-Author: WiFiPilot contributors
-Section: Networking
-Depends: firmware (>= 16.0), firmware (<< 17.0), uikittools
-Architecture: iphoneos-arm64
-Version: 0.3.0
-Installed-Size: 428
-Filename: pool/WiFiPilot_0.3.0_rootless.deb
-Size: 38534
-MD5sum: b548118e1793f54bccad378bf4bb2fcb
-SHA256: 1b167c5352ad88589e3ff7f36b04c5aeb25b715addfa6cf61b79b84a07d6120d
-SHA512: dc6ede6d4b2ac65ad1283cca89e943e052f3eb2c81a6d1cdbf1403871a07931eae5a6437da8c4a7ac05fc08b8ecdbc6f1e1a2f3f86b197d57a08a128b30b6953
-Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/wifipilot-icon-e44fa7d83933.png
-Depiction: https://github.com/dinaxy148822822-create/WiFiPilot/releases/tag/v0.3.0
-
