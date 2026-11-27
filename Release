@@ -3,9 +3,10 @@ Label: SelectBlocks Rootless
 Suite: stable
 Codename: selectblocks-rootless
 Version: 1.1.0
-Date: Fri, 27 Nov 2026 17:15:15 GMT
+Date: Fri, 27 Nov 2026 17:23:30 GMT
 Architectures: iphoneos-arm64
 Components: main
+Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/icon-7c92cd9bb0af.png
 Description: SelectBlocks Rootless packages; unsigned metadata over HTTPS
 MD5Sum:
  01c80fea12b89f6bde268b43e60ae8c0 827 Packages

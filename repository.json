@@ -9,21 +9,24 @@
       "url": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/legacy/",
       "version": "1.1.0",
       "depends": "firmware (>= 12.0), firmware (<< 14.0), mobilesubstrate",
-      "file": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/legacy/pool/SelectBlocks_1.1.0_rootful-legacy.deb"
+      "file": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/legacy/pool/SelectBlocks_1.1.0_rootful-legacy.deb",
+      "icon": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/legacy/icon-7c92cd9bb0af.png"
     },
     {
       "variant": "rootful",
       "url": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/rootful/",
       "version": "1.1.0",
       "depends": "firmware (>= 14.0), mobilesubstrate",
-      "file": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/rootful/pool/SelectBlocks_1.1.0_rootful.deb"
+      "file": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/rootful/pool/SelectBlocks_1.1.0_rootful.deb",
+      "icon": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/rootful/icon-7c92cd9bb0af.png"
     },
     {
       "variant": "rootless",
       "url": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/",
       "version": "1.1.0",
       "depends": "firmware (>= 15.0), mobilesubstrate",
-      "file": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/pool/SelectBlocks_1.1.0_rootless.deb"
+      "file": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/pool/SelectBlocks_1.1.0_rootless.deb",
+      "icon": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/icon-7c92cd9bb0af.png"
     }
   ],
   "signed": false
