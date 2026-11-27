@@ -117,8 +117,8 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
     (folder / 'Packages.gz').write_bytes(gzip.compress(package_data, mtime=0))
     (folder / 'Packages.bz2').write_bytes(bz2.compress(package_data))
     release = [
-        'Origin: SelectBlocks',
-        'Label: SelectBlocks ' + CHANNELS[variant]['title'],
+        'Origin: saya',
+        'Label: saya',
         'Suite: stable',
         'Codename: selectblocks-' + variant,
         'Version: ' + meta['Version'],
@@ -247,6 +247,9 @@ class RepositoryTests(unittest.TestCase):
                 self.assertEqual((folder / record['Filename']).read_bytes(), fixture.read_bytes())
                 self.assertIn(hashlib.sha256(raw).hexdigest(), (folder / 'Release').read_text())
                 self.assertEqual(entry['variant'], variant)
+                release_meta = fields((folder / 'Release').read_text())
+                self.assertEqual(release_meta['Origin'], 'saya')
+                self.assertEqual(release_meta['Label'], 'saya')
                 self.assertTrue((folder / 'CydiaIcon.png').read_bytes().startswith(b'\x89PNG'))
 
     def test_sileo_mandatory_release_components(self):
