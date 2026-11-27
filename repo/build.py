@@ -208,7 +208,10 @@ def main():
             entries.append(write_channel(out / suffix, variant, deb, meta, source_url, web_url + (suffix + '/' if suffix else '')))
     if len(versions) != 1:
         raise ValueError('Refusing to mix different versions across release variants')
-    config = {'repository': 'https://github.com/' + args.repository, 'release': release['html_url'], 'version': next(iter(versions)), 'base': base_url, 'entries': entries, 'signed': False}
+    from extra_packages import publish_pinned
+    with tempfile.TemporaryDirectory() as temp:
+        extra_entries = publish_pinned(out, base_url, entries, temp)
+    config = {'repository': 'https://github.com/' + args.repository, 'release': release['html_url'], 'version': next(iter(versions)), 'base': base_url, 'entries': entries, 'signed': False, 'extra_packages': extra_entries}
     page = make_page(config)
     (out / 'index.html').write_text(page)
     for variant in ('rootful', 'rootful-legacy'):
@@ -278,6 +281,34 @@ class RepositoryTests(unittest.TestCase):
             self.assertNotEqual(package['Icon'], release['Icon'])
             self.assertEqual((folder / entry['package_icon'].rsplit('/', 1)[1]).read_bytes(), png_icon(use_custom=False))
             self.assertEqual((folder / 'CydiaIcon.png').read_bytes(), png_icon())
+
+    def test_extra_package_preserves_existing_source_and_hashes(self):
+        from extra_packages import append_record
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            fixture = root / 'SelectBlocks_0.0-test_rootless.deb'
+            fixture.write_bytes(b'UNIT TEST FIXTURE, NOT AN INSTALLABLE DEB')
+            meta = {'Package': 'local.selectblocks', 'Name': 'SelectBlocks', 'Architecture': 'iphoneos-arm64', 'Version': '0.0-test', 'Depends': 'firmware (>= 15.0)'}
+            folder = root / 'site'
+            write_channel(folder, 'rootless', fixture, meta, 'https://example.invalid/')
+            original = (folder / 'Packages').read_bytes()
+            source_icon = (folder / 'CydiaIcon.png').read_bytes()
+            old_release = fields((folder / 'Release').read_text())
+            extra = {'Package': 'local.wifipilot', 'Name': 'WiFiPilot (Experimental)', 'Architecture': 'iphoneos-arm64', 'Version': '0.1.0', 'Depends': 'firmware (>= 16.0), firmware (<< 17.0)', 'Icon': 'https://example.invalid/wifi.png'}
+            append_record(folder, extra)
+            raw = (folder / 'Packages').read_bytes()
+            self.assertTrue(raw.startswith(original))
+            self.assertEqual(len([x for x in raw.decode().split('\n\n') if x.strip()]), 2)
+            self.assertIn(b'Package: local.wifipilot', raw)
+            self.assertEqual(gzip.decompress((folder / 'Packages.gz').read_bytes()), raw)
+            self.assertEqual(bz2.decompress((folder / 'Packages.bz2').read_bytes()), raw)
+            new_release = fields((folder / 'Release').read_text())
+            for key in ('Origin', 'Label', 'Icon', 'Components', 'Architectures'):
+                self.assertEqual(new_release[key], old_release[key])
+            self.assertIn(hashlib.sha256(raw).hexdigest(), new_release['SHA256'])
+            self.assertEqual((folder / 'CydiaIcon.png').read_bytes(), source_icon)
+            with self.assertRaisesRegex(ValueError, 'Duplicate'):
+                append_record(folder, extra)
 
     def test_html_payload_escaping(self):
         page = make_page({'version': '</script><script>bad</script>'})

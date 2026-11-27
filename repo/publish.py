@@ -49,7 +49,7 @@ with tempfile.TemporaryDirectory(prefix='selectblocks-apt-') as temp:
         git('push', 'origin', 'HEAD:refs/heads/apt')
 
     requests = []
-    for entry in config['entries']:
+    for entry in config['entries'] + config.get('extra_packages', []):
         folder = site / CHANNELS[entry['variant']]['path']
         package_name = entry['file'].rsplit('/', 1)[1]
         icon_name = entry['icon'].rsplit('/', 1)[1]
@@ -87,6 +87,7 @@ with tempfile.TemporaryDirectory(prefix='selectblocks-apt-') as temp:
                     time.sleep(10)
         return False, '| FAILED: ' + error + ' | ' + url + ' |'
 
+    requests = list(dict(requests).items())
     results = list(ThreadPoolExecutor(max_workers=8).map(verify, requests))
     report = '# Live APT verification\n\nChecked: ' + datetime.datetime.now(datetime.timezone.utc).isoformat() + '\n\nUser-Agent: Sileo/2.5 APT-HTTP/1.3\n\n| Result | URL |\n| --- | --- |\n' + '\n'.join(row for ok, row in results) + '\n'
     (root / 'repository-health.md').write_text(report)
