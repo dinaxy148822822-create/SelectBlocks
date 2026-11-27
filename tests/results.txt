@@ -1,0 +1,1 @@
+PASS: 28 shapes, 1000 bags, scoring, levels, hold, rotations, 2500 randomized games (207161 actions).

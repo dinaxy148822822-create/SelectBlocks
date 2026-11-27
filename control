@@ -1,0 +1,9 @@
+Package: local.selectblocks
+Name: SelectBlocks (Experimental)
+Version: 0.1.0
+Architecture: iphoneos-arm64
+Description: Experimental local falling-block game triggered by selecting tetris in supported text views.
+Maintainer: Local Build
+Author: Local Build
+Section: Tweaks
+Depends: firmware (>= 16.0), firmware (<< 17.0), mobilesubstrate
