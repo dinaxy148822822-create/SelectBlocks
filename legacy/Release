@@ -1,0 +1,20 @@
+Origin: SelectBlocks
+Label: SelectBlocks Rootful Legacy
+Suite: stable
+Codename: selectblocks-rootful-legacy
+Version: 1.1.0
+Date: Fri, 27 Nov 2026 17:09:05 GMT
+Architectures: iphoneos-arm
+Description: SelectBlocks Rootful Legacy packages; unsigned metadata over HTTPS
+MD5Sum:
+ 74665bfa02ff466a93a9032aef3bfbc6 883 Packages
+ 390758430257ba27d3ea3dd87d4acd62 576 Packages.gz
+ 9129f54513e0ea2908125f0fa0e22000 643 Packages.bz2
+SHA256:
+ fb34de30b735f2353767058cf51d5492173675d228928a7a27d7423d6696be13 883 Packages
+ 9dd26630ec6cc17e2d1524f6328c25f42a446152e184dac6f11cee3b5c5ad254 576 Packages.gz
+ 8916e91036f1e9af7274999e5155970b6fec180a81be6b6ee4629c4602bd016d 643 Packages.bz2
+SHA512:
+ 420f33ef613926c0e85b777a5f964986fdab6dd2a3464eb2a9e289c023efa243cf47a4c709d5b018ccf33dc6860799cdb1d3937001c76da6ac45b54ec92c43cc 883 Packages
+ 35ed7c21458fd6ade4be4156cda2ea5d192d453aca2dbb1d2f653e5d9389e1d868db0d345da85ecf528156a17a17d095c0f8dd7da0e8e3211e0b9a3a4c437db3 576 Packages.gz
+ e40b4b36e60d1ecf4fd158a9d7363a50132e29fe576ec89fcccbbd8db2e78fd9abddf80abe4ce848907e6d92f8faf155090dd7ffd088deb73e8a47efcb78bfdf 643 Packages.bz2

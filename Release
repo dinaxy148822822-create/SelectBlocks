@@ -1,0 +1,20 @@
+Origin: SelectBlocks
+Label: SelectBlocks Rootless
+Suite: stable
+Codename: selectblocks-rootless
+Version: 1.1.0
+Date: Fri, 27 Nov 2026 17:09:06 GMT
+Architectures: iphoneos-arm64
+Description: SelectBlocks Rootless packages; unsigned metadata over HTTPS
+MD5Sum:
+ 01c80fea12b89f6bde268b43e60ae8c0 827 Packages
+ 5c43bcd1e9b81e1f9c528cc5704557e4 547 Packages.gz
+ 9af4178ae786f4a42998d04034822935 610 Packages.bz2
+SHA256:
+ 01ccc4574d9d743df791e365ecafb5645f41daa48473764e1284d8c24a4f1d84 827 Packages
+ 7fab2faa90222e98e7c3d837bef00109cce69cae71b83c958bbcf2fa832241ab 547 Packages.gz
+ 4eecfa77e346f16dcea050156faca9228a545b7f4a6ffeca863130de6111a339 610 Packages.bz2
+SHA512:
+ 210b906642b06d4e3a7eadfa70b4cdef9fe15981a4d5c53c4582ab052f6f4fbb10b168745872d1bceb655189d6db36d1ae5626e845ae500364d91db1b3ef6e84 827 Packages
+ 8f7c4a1f7079fd15e988769201c7ef60e6d3b2eaaee9c5d559885336328cb0e85181067f50a335624ed11770e54fcc6de80d58d45be3f84f6065e02008911eb1 547 Packages.gz
+ bf22329d95cb4fcd4ade964d5f1382168384f7545da88c3783a3b829291686ebb74d5978622cc6c1c94fafc5d3856273928ba0902872be267ce48d83e2fa4597 610 Packages.bz2

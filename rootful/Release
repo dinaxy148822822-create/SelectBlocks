@@ -1,0 +1,20 @@
+Origin: SelectBlocks
+Label: SelectBlocks Rootful
+Suite: stable
+Codename: selectblocks-rootful
+Version: 1.1.0
+Date: Fri, 27 Nov 2026 17:09:06 GMT
+Architectures: iphoneos-arm
+Description: SelectBlocks Rootful packages; unsigned metadata over HTTPS
+MD5Sum:
+ da610cb254aed5b984f61eecc4244ba2 839 Packages
+ 27a11c599867ec3f49cb0bbf09789c9b 550 Packages.gz
+ cf6e4a4ac27defbad2bfb672e2c7336d 615 Packages.bz2
+SHA256:
+ 002dd3bdecfbb94a427a33f62cc0d40ea651eaf3a751a370480034d27027474e 839 Packages
+ 0ba2b789a6568a029bb035b06403c980068cb6d61aae23e9f46ab2075c47d4b9 550 Packages.gz
+ 9294ebe58d5d7096930b4902eff5462bd33d7d25de44ecb26517ff26611febd9 615 Packages.bz2
+SHA512:
+ 4a819c6ef5dc4a7b76ee8690c723ed5f3f3c7e9fad48e7fe75f470fb6264e14326e05ba746b0a64166e4bd033b025428f83488bf1f41db3de5ca454ce4a35a23 839 Packages
+ 8492c3f83226130c01dea7eba9dfdc6b120854a837c65979454a44b493298a1b0d0dd266570be8ff1a91a8b52190d361b9b76dc5753430a2582fe6bb37a1770f 550 Packages.gz
+ 7d198fdee505d9395a951c173fc14904770a27d563d203337e5266794b4cf4e014ea6290925d1548e27f991abcd36f84ee9511f56da8ec0f706983f9097b0986 615 Packages.bz2

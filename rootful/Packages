@@ -1,0 +1,18 @@
+Package: local.selectblocks
+Name: SelectBlocks
+Description: Retro falling-block game with chiptune effects and multilingual selection triggers. rootful iOS 14+; arm64 and modern arm64e.
+Maintainer: Local Build
+Author: Local Build
+Section: Tweaks
+Depends: firmware (>= 14.0), mobilesubstrate
+Architecture: iphoneos-arm
+Version: 1.1.0
+Installed-Size: 308
+Filename: pool/SelectBlocks_1.1.0_rootful.deb
+Size: 46326
+MD5sum: ae02e0319374a8b397513ec72bbfe2f3
+SHA256: d7bebf8f6b630414b90362c11d5eb2dccaafe9e487f45a30b46814e8e203b039
+SHA512: a155635ad6254a901449f911dd59f72f24c85ee2499f592399b83613d917844bb33970707a2f73eeee800d9006e89056084a5dd6c3f5eb5049d378dc0d824725
+Depiction: https://dinaxy148822822-create.github.io/SelectBlocks/rootful/
+Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/rootful/CydiaIcon.png
+
