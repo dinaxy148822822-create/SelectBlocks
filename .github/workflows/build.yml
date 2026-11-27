@@ -35,6 +35,11 @@ jobs:
           node tests/test_selection.js
           clang -fobjc-arc -framework Foundation tests/test_triggers.m -o "$RUNNER_TEMP/selectblocks-triggers"
           "$RUNNER_TEMP/selectblocks-triggers"
+      - name: Test per-letter intro colors and lifecycle guards
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra -Werror tests/test_intro_colors.c -lm -o "$RUNNER_TEMP/selectblocks-intro-test"
+          "$RUNNER_TEMP/selectblocks-intro-test"
+          python3 tests/test_intro_source.py
       - name: Check variant metadata
         run: python3 tests/test_variants.py
   build:

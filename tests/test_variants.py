@@ -11,7 +11,7 @@ for variant, (arch, dependency) in configs.items():
  assert props['Architecture'] == arch, variant
  assert dependency in props['Depends'], variant
  assert props['Package'] == 'local.selectblocks', variant
- assert props['Version'] == '1.1.0', variant
+ assert props['Version'] == '1.2.0', variant
  assert 'mobilesubstrate' in props['Depends'], variant
 source = (root / 'Tweak.xm').read_text()
 assert 'majorVersion!=16' not in source

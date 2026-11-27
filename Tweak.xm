@@ -2,6 +2,7 @@
 #import <WebKit/WebKit.h>
 #import <objc/runtime.h>
 #import "Game.h"
+#import "IntroColors.h"
 #import "TriggerWords.h"
 #import "SBAudio.h"
 #include <stdlib.h>
@@ -151,7 +152,7 @@ static void RetroPanel(CGRect rect) {
 }
 @end
 @interface SBGameController : UIViewController {
- Game _game; BOOL _paused; double _lastTick,_fall,_lock,_pressedAt; int _pressed; int _best; BOOL _appeared; BOOL _closing; BOOL _entryRunning;
+ Game _game; BOOL _paused; double _lastTick,_fall,_lock,_pressedAt; int _pressed; int _best; BOOL _appeared; BOOL _closing; BOOL _entryRunning; BOOL _introColorsActive; double _introColorsStarted;
 }
 @property(nonatomic,strong) NSTimer *timer;
 @property(nonatomic,strong) SBAudio *audio;
@@ -161,6 +162,10 @@ static void RetroPanel(CGRect rect) {
 @property(nonatomic,strong) SBBoard *board;
 @property(nonatomic,strong) SBScorePanel *stats;
 @property(nonatomic,strong) UILabel *logo;
+@property(nonatomic,strong) UILabel *introWord;
+@property(nonatomic,strong) UIFont *entryFont;
+@property(nonatomic,copy) NSAttributedString *introLogoOriginal;
+@property(nonatomic,copy) NSAttributedString *introWordOriginal;
 @property(nonatomic,copy) NSString *entryWord;
 @property(nonatomic,strong) UIImage *entryImage;
 @property(nonatomic,assign) CGRect entryRect;
@@ -215,17 +220,55 @@ static void RetroPanel(CGRect rect) {
  [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(background:) name:UIApplicationWillResignActiveNotification object:nil];
  self.timer=[NSTimer timerWithTimeInterval:.05 repeats:YES block:^(NSTimer *t){[weakSelf tick];}];[NSRunLoop.mainRunLoop addTimer:self.timer forMode:NSRunLoopCommonModes];[self refresh];
 }
+- (NSAttributedString *)introText:(NSAttributedString *)base elapsed:(double)elapsed {
+ if(!base.length)return base;
+ NSMutableAttributedString *text=[base mutableCopy];__block NSUInteger letter=0;
+ [base.string enumerateSubstringsInRange:NSMakeRange(0,base.length) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString *substring,NSRange range,NSRange enclosing,BOOL *stop){
+  SBIntroColorSample sample=SBIntroColorAt(letter++,elapsed);
+  CGFloat r0=0,g0=0,b0=0,a0=1,r1=0,g1=0,b1=0,a1=1;
+  [PieceColor(sample.from+1) getRed:&r0 green:&g0 blue:&b0 alpha:&a0];
+  [PieceColor(sample.to+1) getRed:&r1 green:&g1 blue:&b1 alpha:&a1];
+  UIColor *color=[UIColor colorWithRed:r0+(r1-r0)*sample.mix green:g0+(g1-g0)*sample.mix blue:b0+(b1-b0)*sample.mix alpha:1];
+  [text addAttribute:NSForegroundColorAttributeName value:color range:range];
+ }];return text;
+}
+- (void)startIntroColors {
+ if(UIAccessibilityIsReduceMotionEnabled())return;
+ self.introLogoOriginal=[self.logo.attributedText copy];self.introWordOriginal=[self.introWord.attributedText copy];
+ _introColorsStarted=NSProcessInfo.processInfo.systemUptime;_introColorsActive=YES;[self updateIntroColors];
+}
+- (void)updateIntroColors {
+ if(!_introColorsActive)return;
+ if(_closing||UIAccessibilityIsReduceMotionEnabled()||UIApplication.sharedApplication.applicationState!=UIApplicationStateActive){[self stopIntroColors];return;}
+ double elapsed=NSProcessInfo.processInfo.systemUptime-_introColorsStarted;
+ self.logo.attributedText=[self introText:self.introLogoOriginal elapsed:elapsed];
+ if(self.introWord)self.introWord.attributedText=[self introText:self.introWordOriginal elapsed:elapsed];
+}
+- (void)stopIntroColors {
+ _introColorsActive=NO;
+ if(self.introLogoOriginal)self.logo.attributedText=self.introLogoOriginal;
+ if(self.introWordOriginal)self.introWord.attributedText=self.introWordOriginal;
+ self.introLogoOriginal=nil;self.introWordOriginal=nil;
+}
+- (void)finishEntry {
+ [self stopIntroColors];[self.introWord removeFromSuperview];self.introWord=nil;
+ self.logo.alpha=1;_entryRunning=NO;self.surface.userInteractionEnabled=!_closing;self.entryImage=nil;self.entryFont=nil;
+}
 - (void)viewDidAppear:(BOOL)animated {
  [super viewDidAppear:animated];if(_appeared)return;_appeared=YES;[self.view layoutIfNeeded];
  BOOL reduce=UIAccessibilityIsReduceMotionEnabled();self.surface.alpha=0;_entryRunning=YES;self.surface.userInteractionEnabled=NO;
  BOOL fly=!reduce&&self.entryImage&&!CGRectIsNull(self.entryRect)&&!CGRectIsEmpty(self.entryRect);
- if(!fly){[UIView animateWithDuration:reduce?.15:.30 animations:^{self.surface.alpha=1;} completion:^(BOOL done){self->_entryRunning=NO;self.surface.userInteractionEnabled=YES;self.entryImage=nil;}];return;}
+ if(!fly){[self startIntroColors];[UIView animateWithDuration:reduce?.15:.30 animations:^{self.surface.alpha=1;} completion:^(BOOL done){[self finishEntry];}];return;}
  self.logo.alpha=0;
- UIImageView *word=[[UIImageView alloc]initWithImage:self.entryImage];word.contentMode=UIViewContentModeScaleAspectFit;word.frame=self.entryRect;word.layer.shadowColor=UIColor.whiteColor.CGColor;word.layer.shadowOpacity=.4;word.layer.shadowRadius=5;[self.view addSubview:word];
+ UILabel *word=[[UILabel alloc]initWithFrame:self.entryRect];self.introWord=word;word.backgroundColor=UIColor.clearColor;word.userInteractionEnabled=NO;word.isAccessibilityElement=NO;
+ word.attributedText=[[NSAttributedString alloc]initWithString:self.entryWord?:@"" attributes:@{NSFontAttributeName:self.entryFont?:[UIFont systemFontOfSize:17]}];
+ word.layer.shadowColor=UIColor.whiteColor.CGColor;word.layer.shadowOpacity=.4;word.layer.shadowRadius=5;[self.view addSubview:word];
  CGRect logoText=[self.logo textRectForBounds:self.logo.bounds limitedToNumberOfLines:1];
  CGRect destination=[self.logo convertRect:logoText toView:self.view];
+ CGFloat scale=MIN(destination.size.width/MAX(1,self.entryRect.size.width),destination.size.height/MAX(1,self.entryRect.size.height));
+ [self startIntroColors];
  [UIView animateWithDuration:.30 animations:^{self.surface.alpha=1;}];
- [UIView animateWithDuration:.62 delay:0 usingSpringWithDamping:.91 initialSpringVelocity:.1 options:0 animations:^{word.frame=destination;} completion:^(BOOL done){[word removeFromSuperview];self.logo.alpha=1;self->_entryRunning=NO;self.surface.userInteractionEnabled=YES;self.entryImage=nil;}];
+ [UIView animateWithDuration:.62 delay:0 usingSpringWithDamping:.91 initialSpringVelocity:.1 options:0 animations:^{word.center=CGPointMake(CGRectGetMidX(destination),CGRectGetMidY(destination));word.transform=CGAffineTransformMakeScale(scale,scale);} completion:^(BOOL done){[self finishEntry];}];
  [UIView animateWithDuration:.20 delay:.42 options:0 animations:^{word.alpha=0;self.logo.alpha=1;} completion:nil];
 }
 - (UIButton *)button:(NSString *)name caption:(NSString *)caption symbol:(NSString *)symbol utility:(BOOL)utility prominent:(BOOL)prominent action:(void(^)(void))action {
@@ -257,7 +300,7 @@ static void RetroPanel(CGRect rect) {
  UIAlertController *a=[UIAlertController alertControllerWithTitle:@"Новая игра?" message:@"Текущая партия будет сброшена." preferredStyle:UIAlertControllerStyleAlert];__weak typeof(self) w=self;
  [a addAction:[UIAlertAction actionWithTitle:@"Отмена" style:UIAlertActionStyleCancel handler:^(UIAlertAction *x){SBGameController *s=w;if(s){s->_paused=wasPaused;[s refresh];}}]];
  [a addAction:[UIAlertAction actionWithTitle:@"Начать" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *x){SBGameController *s=w;if(s){[s persist];gameNew(&s->_game,arc4random());s->_paused=NO;s->_fall=s->_lock=0;[s persist];[s refresh];}}]];[self presentViewController:a animated:YES completion:nil];}
-- (void)tick {double now=NSDate.timeIntervalSinceReferenceDate,dt=fmin(.1,fmax(0,now-_lastTick));_lastTick=now;if(_paused||_game.over||_entryRunning)return;
+- (void)tick {[self updateIntroColors];double now=NSDate.timeIntervalSinceReferenceDate,dt=fmin(.1,fmax(0,now-_lastTick));_lastTick=now;if(_paused||_game.over||_entryRunning)return;
  if(_pressed>=0&&now-_pressedAt>.22){[self step:_pressed];}
  _fall+=dt;if(_fall>=gravity(&_game)){_fall=0;movePiece(&_game,0,1);}
  if(!fits(&_game,_game.x,_game.y+1,_game.rot)){_lock+=dt;if(_lock>=.45){int before=_game.lines;lockPiece(&_game);[self playLockResult:before drop:NO];_lock=0;_fall=0;[self persist];}}else _lock=0;
@@ -273,9 +316,9 @@ static void RetroPanel(CGRect rect) {
  for(int i=0;i<3;i++){if(self.previews[i].type!=_game.next[i]){self.previews[i].type=_game.next[i];[self.previews[i] setNeedsDisplay];}}[self.board setNeedsDisplay];
 }
 - (void)persist {NSUserDefaults *d=NSUserDefaults.standardUserDefaults;_best=MAX(_best,_game.score);[d setInteger:_best forKey:@"SelectBlocks.best.v1"];[d setObject:[NSData dataWithBytes:&_game length:sizeof _game] forKey:@"SelectBlocks.state.v1"];}
-- (void)background:(NSNotification *)n{_paused=YES;_pressed=-1;[self persist];[self refresh];}
+- (void)background:(NSNotification *)n{[self finishEntry];_paused=YES;_pressed=-1;[self persist];[self refresh];}
 - (void)closeGame {
- if(_closing)return;_closing=YES;[self persist];[self.timer invalidate];self.timer=nil;[NSNotificationCenter.defaultCenter removeObserver:self];self.view.userInteractionEnabled=NO;
+ if(_closing)return;_closing=YES;[self finishEntry];[self persist];[self.timer invalidate];self.timer=nil;[NSNotificationCenter.defaultCenter removeObserver:self];self.view.userInteractionEnabled=NO;
  UIWindow *closingWindow=gameWindow;BOOL reduce=UIAccessibilityIsReduceMotionEnabled();
  [UIView animateWithDuration:reduce?.12:.20 animations:^{self.surface.alpha=0;if(!reduce)self.surface.transform=CGAffineTransformMakeTranslation(0,24);} completion:^(BOOL finished){
   closingWindow.hidden=YES;closingWindow.rootViewController=nil;if(gameWindow==closingWindow)gameWindow=nil;[previousWindow makeKeyWindow];lastClose=NSDate.timeIntervalSinceReferenceDate;
@@ -316,7 +359,7 @@ static void ShowGame(UIView *source,NSString *selected,CGRect selectedRect,CGFlo
  }
  previousWindow=origin;
  gameWindow=overlay;gameWindow.windowLevel=UIWindowLevelNormal+5;if(@available(iOS 13.0,*))gameWindow.overrideUserInterfaceStyle=UIUserInterfaceStyleDark;
- SBGameController *controller=[SBGameController new];controller.entryWord=word;controller.entryImage=wordImage;controller.entryRect=UsableRect(originRect)?[gameWindow convertRect:originRect fromWindow:origin]:CGRectNull;
+ SBGameController *controller=[SBGameController new];controller.entryWord=word;controller.entryFont=font;controller.entryImage=wordImage;controller.entryRect=UsableRect(originRect)?[gameWindow convertRect:originRect fromWindow:origin]:CGRectNull;
  [origin endEditing:YES];gameWindow.rootViewController=controller;[gameWindow makeKeyAndVisible];
 }
 static char checkKey;
