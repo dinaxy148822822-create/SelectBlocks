@@ -35,9 +35,9 @@ def append_record(folder, record):
 def publish_pinned(out, base_url, entries, workdir):
     # User-approved experimental release. Updating it requires a deliberate code change.
     repository = 'dinaxy148822822-create/WiFiPilot'
-    tag = 'v0.1.0'
-    name = 'WiFiPilot_0.1.0_rootless.deb'
-    expected_hash = '4312439b6718e2ea4dbbb77b22c6d6ad342937d75271ec19e05af80006e50723'
+    tag = 'v0.2.0'
+    name = 'WiFiPilot_0.2.0_rootless.deb'
+    expected_hash = 'cb0c31329839713fd81d25643d8440b8e8c95532c9dad6f218dac1fe339fedf8'
     release = json.loads(subprocess.check_output(['gh', 'api', 'repos/' + repository + '/releases/tags/' + tag], text=True))
     if release.get('draft') or release.get('tag_name') != tag:
         raise ValueError('Pinned WiFiPilot release unavailable')
@@ -53,7 +53,7 @@ def publish_pinned(out, base_url, entries, workdir):
     # Import lazily so build.py can import this helper without a circular import.
     from build import fields, validate_release_fields
     meta = fields(text)
-    if meta.get('Package') != 'local.wifipilot' or meta.get('Architecture') != 'iphoneos-arm64' or meta.get('Version') != '0.1.0':
+    if meta.get('Package') != 'local.wifipilot' or meta.get('Architecture') != 'iphoneos-arm64' or meta.get('Version') != '0.2.0':
         raise ValueError('Unexpected WiFiPilot package metadata')
     if 'firmware (>= 16.0)' not in meta.get('Depends', '') or 'firmware (<< 17.0)' not in meta.get('Depends', ''):
         raise ValueError('WiFiPilot iOS-16-only dependency bounds missing')
