@@ -1,0 +1,98 @@
+name: Publish APT Repository
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+  workflow_run:
+    workflows: [Build DEB]
+    branches: [main]
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - 'repo/**'
+      - '.github/workflows/repository.yml'
+  schedule:
+    - cron: '17 4 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: selectblocks-apt-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      pages_enabled: ${{ steps.pages.outputs.enabled }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Test repository generator
+        run: python3 repo/build.py --self-test
+      - name: Download real release assets and generate APT indexes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APT_BASE_URL: ${{ vars.APT_BASE_URL }}
+        run: python3 repo/build.py --output _site
+      - name: Check GitHub Pages configuration
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if gh api "repos/${GITHUB_REPOSITORY}/pages" > /tmp/selectblocks-pages.json 2>/tmp/selectblocks-pages.err; then
+            MODE=$(python3 -c 'import json; print(json.load(open("/tmp/selectblocks-pages.json")).get("build_type", ""))')
+            if [ "$MODE" = "workflow" ]; then
+              echo 'enabled=true' >> "$GITHUB_OUTPUT"
+            else
+              echo 'enabled=false' >> "$GITHUB_OUTPUT"
+              echo '::notice::Set Settings > Pages > Source to GitHub Actions, then run this workflow again.'
+            fi
+          elif grep -q 'HTTP 404' /tmp/selectblocks-pages.err; then
+            echo 'enabled=false' >> "$GITHUB_OUTPUT"
+            echo '::notice::Enable Settings > Pages > Source: GitHub Actions, then run this workflow again.'
+          else
+            cat /tmp/selectblocks-pages.err >&2
+            exit 1
+          fi
+          {
+            echo '## SelectBlocks APT repository'
+            echo ''
+            echo 'Built from actual published release DEBs, with isolated rootless/rootful/legacy indexes.'
+            echo ''
+            echo 'First-time setup: Settings → Pages → Build and deployment → Source → GitHub Actions.'
+            echo 'Then Actions → Publish APT Repository → Run workflow.'
+            echo ''
+            echo 'Metadata is currently unsigned. Do not disable APT security checks globally.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - uses: actions/configure-pages@v5
+        if: steps.pages.outputs.enabled == 'true'
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.pages_enabled == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy APT repository
+        id: deployment
+        uses: actions/deploy-pages@v4

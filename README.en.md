@@ -1,3 +1,5 @@
+**[Русский](README.ru.md) · [English](README.en.md) · [Sileo / Zebra](repo/README.md)**
+
 ![SelectBlocks — Select. Play. Repeat.](docs/assets/banner.svg)
 
 # SelectBlocks
@@ -64,7 +66,7 @@ Score: **100 / 300 / 500 / 800 × current level** for one through four lines. So
 
 ## Trigger names
 
-Examples: `tetris` · `тетрис` · `тетріс` · `テトリス` · `테트리스` · `تتريس` · `טטריס` · `俄罗斯方块`.
+Examples: `tetris` · `тетрис` · `тетріс` · `テトリス` · `테트리스` · `تتريس` · `טטרי��` · `俄罗斯方块`.
 
 The [full list](TriggerWords.json) contains 18 spellings, not 18 independently tested language environments. Matching normalizes case, compatible full-width forms, selected diacritics and Arabic marks. Only an entire recognized selection triggers the game; `let's play tetris` does not. This is an explicit alias list, not an automatic translator.
 

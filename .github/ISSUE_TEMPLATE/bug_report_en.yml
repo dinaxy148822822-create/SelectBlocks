@@ -1,0 +1,56 @@
+name: English · Bug report
+description: Report a reproducible problem. Не прикладывайте секреты.
+title: '[Bug]: '
+body:
+- type: markdown
+  attributes:
+    value: Check the FAQ and existing issues first. English or Russian is welcome. Remove tokens and private app
+      content from attachments.
+- type: input
+  id: release
+  attributes:
+    label: SelectBlocks version and package variant
+    placeholder: e.g. 1.0.0 rootless; exact DEB filename
+  validations:
+    required: true
+- type: input
+  id: environment
+  attributes:
+    label: Device, iOS, jailbreak and loader versions
+    placeholder: Include exact versions; do not include device identifiers.
+  validations:
+    required: true
+- type: input
+  id: app
+  attributes:
+    label: Host app and version
+    description: State whether injection is enabled and whether it is a native editor, web page, PDF or custom field.
+  validations:
+    required: true
+- type: textarea
+  id: steps
+  attributes:
+    label: Steps to reproduce / Шаги
+    description: Use a harmless test word, not private content.
+  validations:
+    required: true
+- type: textarea
+  id: result
+  attributes:
+    label: Expected behavior and actual behavior
+  validations:
+    required: true
+- type: textarea
+  id: logs
+  attributes:
+    label: Redacted log or screenshot, if useful
+    description: Remove secrets, emails, device identifiers and unrelated app data.
+- type: checkboxes
+  id: checks
+  attributes:
+    label: Before submitting
+    options:
+    - label: I checked the release notes and compatibility guide.
+      required: true
+    - label: My attachments contain no credentials or private app content.
+      required: true

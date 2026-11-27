@@ -18,7 +18,7 @@
 5. Fully quit and reopen the target app so its process can load the updated library.
 6. Make sure tweak injection is allowed for the app. Select an entire [recognized name](../../TriggerWords.json) in a supported text view and wait briefly.
 
-The project currently distributes direct DEB downloads through GitHub Releases. **A Sileo/APT repository URL is not provided.** Adding this GitHub repository URL as a package source will not install the tweak.
+An [APT publishing setup for Sileo/Zebra](../../repo/README.md) is now included. Its source URLs become live only after the owner enables GitHub Pages and deployment succeeds. The github.com source-code URL is not an APT URL. Direct DEB downloads remain available.
 
 ## Update
 

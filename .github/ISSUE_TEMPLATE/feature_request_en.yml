@@ -1,0 +1,26 @@
+name: English · Feature request
+description: Suggest a focused improvement.
+title: '[Feature]: '
+body:
+- type: textarea
+  id: problem
+  attributes:
+    label: What problem would this solve?
+    description: English or Russian is welcome.
+  validations:
+    required: true
+- type: textarea
+  id: proposal
+  attributes:
+    label: Proposed behavior
+    description: Explain the interaction and any compatibility or accessibility considerations.
+  validations:
+    required: true
+- type: textarea
+  id: alternatives
+  attributes:
+    label: Alternatives and trade-offs
+- type: markdown
+  attributes:
+    value: Please do not attach proprietary game assets, credentials or personal app data. A request does not guarantee
+      implementation.

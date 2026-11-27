@@ -1,25 +1,25 @@
-name: Предложить улучшение
+name: Русский · Предложить улучшение
 description: Предложите конкретное улучшение.
-title: "[Предложение]: "
+title: '[Предложение]: '
 body:
-  - type: textarea
-    id: problem
-    attributes:
-      label: Какую проблему это решит?
-      description: "Можно писать по-русски или по-английски."
-    validations:
-      required: true
-  - type: textarea
-    id: proposal
-    attributes:
-      label: Предлагаемое поведение
-      description: "Опишите взаимодействие и требования к совместимости и доступности."
-    validations:
-      required: true
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Альтернативы и компромиссы
-  - type: markdown
-    attributes:
-      value: "Не прикладывайте закрытые ресурсы игр, секреты и личные данные. Предложение не гарантирует реализацию."
+- type: textarea
+  id: problem
+  attributes:
+    label: Какую проблему это решит?
+    description: Можно писать по-русски или по-английски.
+  validations:
+    required: true
+- type: textarea
+  id: proposal
+  attributes:
+    label: Предлагаемое поведение
+    description: Опишите взаимодействие и требования к совместимости и доступности.
+  validations:
+    required: true
+- type: textarea
+  id: alternatives
+  attributes:
+    label: Альтернативы и компромиссы
+- type: markdown
+  attributes:
+    value: Не прикладывайте закрытые ресурсы игр, секреты и личные данные. Предложение не гарантирует реализацию.

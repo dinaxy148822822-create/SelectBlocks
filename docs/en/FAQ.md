@@ -8,7 +8,7 @@ No. It is a jailbreak tweak loaded into compatible app processes. It cannot run 
 
 ## Can I add the GitHub URL to Sileo as a source?
 
-No APT repository is provided here. Download the `.deb` from a release's **Assets** and install it with a compatible package manager.
+The github.com source-code URL is not an APT source. See the separate [GitHub Pages APT URLs](../../repo/README.md), available after owner setup and successful deployment. Direct DEB installation remains available.
 
 ## Nothing happens when I select the word
 

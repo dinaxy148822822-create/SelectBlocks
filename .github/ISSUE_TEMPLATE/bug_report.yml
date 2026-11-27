@@ -1,55 +1,57 @@
-name: Сообщить об ошибке
+name: Русский · Сообщить об ошибке
 description: Опишите воспроизводимую проблему. Не прикладывайте секреты.
-title: "[Ошибка]: "
+title: '[Ошибка]: '
 body:
-  - type: markdown
-    attributes:
-      value: "Сначала проверьте FAQ и существующие обращения. Можно писать по-русски или по-английски. Удалите секреты и личные данные из вложений."
-  - type: input
-    id: release
-    attributes:
-      label: Версия SelectBlocks и вариант пакета
-      placeholder: "Например, 1.0.0 rootless; точное имя DEB"
-    validations:
+- type: markdown
+  attributes:
+    value: Сначала проверьте FAQ и существующие обращения. Можно писать по-русски или по-английски. Удалите секреты
+      и личные данные из вложений.
+- type: input
+  id: release
+  attributes:
+    label: Версия SelectBlocks и вариант пакета
+    placeholder: Например, 1.0.0 rootless; точное имя DEB
+  validations:
+    required: true
+- type: input
+  id: environment
+  attributes:
+    label: Устройство, iOS, версии джейлбрейка и загрузчика
+    placeholder: Укажите точные версии, но не идентификаторы устройства.
+  validations:
+    required: true
+- type: input
+  id: app
+  attributes:
+    label: Приложение и его версия
+    description: 'Укажи��е, разрешена ли инъекция и что это за редактор: стандартный, веб-страница, PDF или нестандартное
+      поле.'
+  validations:
+    required: true
+- type: textarea
+  id: steps
+  attributes:
+    label: Шаги воспроизведения
+    description: Используйте безопасное тестовое слово, не личные данные.
+  validations:
+    required: true
+- type: textarea
+  id: result
+  attributes:
+    label: Ожидаемое и фактическое поведение
+  validations:
+    required: true
+- type: textarea
+  id: logs
+  attributes:
+    label: Обезличенный лог или скриншот, если нужен
+    description: Удалите секреты, адреса почты, идентификаторы и лишние данные приложений.
+- type: checkboxes
+  id: checks
+  attributes:
+    label: Перед отправкой
+    options:
+    - label: Я прочитал описание релиза и ограничения совместимости.
       required: true
-  - type: input
-    id: environment
-    attributes:
-      label: Устройство, iOS, версии джейлбрейка и загрузчика
-      placeholder: "Укажите точные версии, но не идентификаторы устройства."
-    validations:
+    - label: Во вложениях нет секретов и личных данных.
       required: true
-  - type: input
-    id: app
-    attributes:
-      label: Приложение и его версия
-      description: "Укажи��е, разрешена ли инъекция и что это за редактор: стандартный, веб-страница, PDF или нестандартное поле."
-    validations:
-      required: true
-  - type: textarea
-    id: steps
-    attributes:
-      label: Шаги воспроизведения
-      description: "Используйте безопасное тестовое слово, не личные данные."
-    validations:
-      required: true
-  - type: textarea
-    id: result
-    attributes:
-      label: Ожидаемое и фактическое поведение
-    validations:
-      required: true
-  - type: textarea
-    id: logs
-    attributes:
-      label: Обезличенный лог или скриншот, если нужен
-      description: "Удалите секреты, адреса почты, идентификаторы и лишние данные приложений."
-  - type: checkboxes
-    id: checks
-    attributes:
-      label: Перед отправкой
-      options:
-        - label: Я прочитал описание релиза и ограничения совместимости.
-          required: true
-        - label: Во вложениях нет секретов и личных данных.
-          required: true

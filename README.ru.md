@@ -1,3 +1,5 @@
+**[Русский](README.ru.md) · [English](README.en.md) · [Sileo / Zebra](repo/README.md)**
+
 ![SelectBlocks — Select. Play. Repeat.](docs/assets/banner.svg)
 
 # SelectBlocks
