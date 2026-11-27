@@ -1,0 +1,21 @@
+# Theos / packaging outputs
+.theos/
+packages/
+dist/
+*.deb
+*.dylib
+*.dSYM/
+*.o
+
+# Local tools and caches
+.DS_Store
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+
+# Never commit local credentials
+.env
+.env.*
+*.pem
+*.p12
