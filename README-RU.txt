@@ -1,4 +1,4 @@
-SelectBlocks 1.0.0 — rootless-твик, iOS 16
+SelectBlocks 1.1.0 — rootless/rootful, 64-битные iOS 12+
 ========================================================
 
 ЗАПУСК
@@ -69,8 +69,17 @@ T-spin, combo/back-to-back, онлайн и музыка не реализова
 JS-тесты выбора слова и Foundation-тесты нормализации на macOS,
 собирает rootless DEB и публикует его как обычный релиз без отметки prerelease.
 Локально при установленном Theos/SDK/toolchain/ldid:
-  make clean package FINALPACKAGE=1
-Результат: packages/*.deb (iphoneos-arm64).
+  bash scripts/build.sh rootless
+  bash scripts/build.sh rootful
+  bash scripts/build.sh rootful-legacy
+Выбирайте одну команду для нужной цели. Скрипт подставляет соответствующий
+control из packaging/ и обязательно очищает старые результаты перед сборкой.
+Rootless: iOS 15+, arm64/arm64e, пакет iphoneos-arm64, /var/jb.
+Rootful: iOS 14+, arm64/arm64e, пакет iphoneos-arm, обычный префикс.
+Rootful-legacy: iOS 12–13, только arm64. Не для системных arm64e-процессов
+A12+ на iOS 12/13. Старый arm64e ABI не включён.
+Для исходного iPhone X с Dopamine/rootless выбирайте файл rootless.deb.
+Дополнительные ограничения: RELEASE-NOTES-RU.md.
 
 УДАЛЕНИЕ
 Удалите SelectBlocks в Sileo/Zebra и полностью перезапустите приложения,
@@ -90,3 +99,10 @@ C-логика и JS-обработчик проверяются локальн�
 Новые звуки проверены структурными тестами WAV, но ещё не прослушаны
 на реальном устройстве в этой среде. Обычный статус релиза не является
 гарантией отсутствия ошибок во всех приложениях и на всех устройствах.
+
+СОВМЕСТИМОСТЬ 1.1.0
+Нет жёсткой проверки на iOS 16 и привязки к номеру Dopamine.
+Есть проверки доступности iOS 13, окна без UIScene и классические callback.
+Расширенные цели сборки не означают проверку на каждом устройстве.
+32-битные iOS, iOS ниже 12, старый arm64e ABI и специальные нестандартные
+bootstrap не поддерживаются. Инъекция должна быть разрешена приложению.

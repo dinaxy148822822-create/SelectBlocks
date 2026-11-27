@@ -7,20 +7,21 @@ on:
       - '**.h'
       - '**.json'
       - 'tests/**'
+      - 'scripts/**'
+      - 'packaging/**'
       - Makefile
       - control
       - SelectBlocks.plist
       - .github/workflows/build.yml
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
 jobs:
-  build:
+  test:
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
-      - name: Checkout project
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Test portable game logic
         run: |
           cc -std=c11 -O2 -Wall -Wextra tests/test_game.c -o "$RUNNER_TEMP/selectblocks-test"
@@ -34,6 +35,18 @@ jobs:
           node tests/test_selection.js
           clang -fobjc-arc -framework Foundation tests/test_triggers.m -o "$RUNNER_TEMP/selectblocks-triggers"
           "$RUNNER_TEMP/selectblocks-triggers"
+      - name: Check variant metadata
+        run: python3 tests/test_variants.py
+  build:
+    needs: test
+    runs-on: macos-15
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [rootless, rootful, rootful-legacy]
+    steps:
+      - uses: actions/checkout@v4
       - name: Install build tools
         run: |
           brew list --versions make >/dev/null || brew install make
@@ -47,22 +60,47 @@ jobs:
           mkdir -p "$HOME/theos/sdks"
           cp -R "$RUNNER_TEMP/theos-sdks/"*.sdk "$HOME/theos/sdks/"
           echo "THEOS=$HOME/theos" >> "$GITHUB_ENV"
-      - name: Build rootless package
-        run: gmake clean package FINALPACKAGE=1
-      - name: Downloadable DEB
-        uses: actions/upload-artifact@v4
+      - name: Build package variant
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: bash scripts/build.sh "$VARIANT"
+      - name: Validate and name package
+        env:
+          VARIANT: ${{ matrix.variant }}
+        run: |
+          VERSION="$(awk '/^Version:/{print $2; exit}' control)"
+          mkdir -p dist
+          for DEB in packages/*.deb; do
+            python3 tests/validate_package.py "$VARIANT" "$DEB"
+            cp "$DEB" "dist/SelectBlocks_${VERSION}_${VARIANT}.deb"
+          done
+          test -f "dist/SelectBlocks_${VERSION}_${VARIANT}.deb"
+      - uses: actions/upload-artifact@v4
         with:
-          name: SelectBlocks-rootless-DEB
-          path: packages/*.deb
+          name: SelectBlocks-${{ matrix.variant }}
+          path: dist/*.deb
           if-no-files-found: error
-      - name: Publish DEB to Releases
+  release:
+    needs: [test, build]
+    runs-on: macos-15
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: SelectBlocks-*
+          path: dist
+          merge-multiple: true
+      - name: Publish all three packages
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="$(awk '/^Version:/{print $2; exit}' control)"
-          TAG="v${VERSION}"
-          gh release create "$TAG" packages/*.deb \
+          test "$(find dist -name '*.deb' | wc -l | tr -d ' ')" = 3
+          gh release create "v${VERSION}" dist/*.deb \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "SelectBlocks ${VERSION}" \
-            --notes "SelectBlocks 1.0.0 — обычный релиз без пометки Experimental. Добавлены заново синтезированные короткие 8-битные эффекты движения, поворота, падения, фиксации, линий, четырёх линий, HOLD и проигрыша. SND/OFF вверху отключает звук; настройка сохраняется отдельно для каждого приложения. Фоновая музыка не включена; аудиосессия приложения не перенастраивается. Скачивайте .deb из Assets. Предыдущую версию пользователь проверил на своём iPhone; новые звуковые эффекты и работа во всех приложениях не подтверждены тестированием на устройстве. Называние обычным релизом не гарантирует отсутствие ошибок. Совместимость и удаление описаны в README-RU.txt."
+            --notes-file RELEASE-NOTES-RU.md

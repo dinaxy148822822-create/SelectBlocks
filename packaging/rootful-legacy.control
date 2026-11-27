@@ -1,0 +1,9 @@
+Package: local.selectblocks
+Name: SelectBlocks
+Version: 1.1.0
+Architecture: iphoneos-arm
+Description: Retro falling-block game with chiptune effects and multilingual selection triggers. rootful iOS 12-13; arm64 only, no legacy arm64e system apps.
+Maintainer: Local Build
+Author: Local Build
+Section: Tweaks
+Depends: firmware (>= 12.0), firmware (<< 14.0), mobilesubstrate

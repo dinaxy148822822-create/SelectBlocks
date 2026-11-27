@@ -123,8 +123,11 @@ static void RetroPanel(CGRect rect) {
 @property(nonatomic,copy) NSString *retroSymbol;
 @property(nonatomic,assign) BOOL utility;
 @property(nonatomic,assign) BOOL prominent;
+@property(nonatomic,copy) void (^activation)(void);
+- (void)activate;
 @end
 @implementation SBControl
+- (void)activate {if(self.activation)self.activation();}
 - (void)setHighlighted:(BOOL)value {[super setHighlighted:value];[self setNeedsDisplay];}
 - (void)drawRect:(CGRect)r {
  CGFloat w=self.bounds.size.width,h=self.bounds.size.height;
@@ -227,7 +230,7 @@ static void RetroPanel(CGRect rect) {
 }
 - (UIButton *)button:(NSString *)name caption:(NSString *)caption symbol:(NSString *)symbol utility:(BOOL)utility prominent:(BOOL)prominent action:(void(^)(void))action {
  SBControl *b=[SBControl buttonWithType:UIButtonTypeCustom];b.caption=caption;b.retroSymbol=symbol;b.utility=utility;b.prominent=prominent;b.backgroundColor=UIColor.clearColor;b.accessibilityLabel=name;b.exclusiveTouch=YES;
- [b addAction:[UIAction actionWithHandler:^(__kindof UIAction *a){action();}] forControlEvents:UIControlEventTouchUpInside];return b;
+ b.activation=action;[b addTarget:b action:@selector(activate) forControlEvents:UIControlEventTouchUpInside];return b;
 }
 - (UIButton *)repeatButton:(NSString *)name caption:(NSString *)caption symbol:(NSString *)symbol tag:(NSInteger)tag {
  UIButton *b=[self button:name caption:caption symbol:symbol utility:NO prominent:NO action:^{}];b.tag=tag;
@@ -278,6 +281,7 @@ static void RetroPanel(CGRect rect) {
   closingWindow.hidden=YES;closingWindow.rootViewController=nil;if(gameWindow==closingWindow)gameWindow=nil;[previousWindow makeKeyWindow];lastClose=NSDate.timeIntervalSinceReferenceDate;
  }];
 }
+- (UIStatusBarStyle)preferredStatusBarStyle {return UIStatusBarStyleLightContent;}
 - (void)dealloc {[self.timer invalidate];[NSNotificationCenter.defaultCenter removeObserver:self];}
 @end
 
@@ -287,10 +291,17 @@ static BOOL UsableRect(CGRect rect) {
 static void ShowGame(UIView *source,NSString *selected,CGRect selectedRect,CGFloat webFontSize) {
  if(!NSThread.isMainThread||gameWindow||!TriggerWord(selected)||NSDate.timeIntervalSinceReferenceDate-lastClose<2)return;
  if(UIApplication.sharedApplication.applicationState!=UIApplicationStateActive)return;
- UIWindow *origin=source.window;UIWindowScene *scene=origin.windowScene;if(!scene||scene.activationState!=UISceneActivationStateForegroundActive)return;
+ UIWindow *origin=source.window;if(!origin)return;
+ UIWindow *overlay=nil;
+ if(@available(iOS 13.0,*)){
+  UIWindowScene *scene=origin.windowScene;
+  if(scene){if(scene.activationState!=UISceneActivationStateForegroundActive)return;overlay=[[UIWindow alloc]initWithWindowScene:scene];overlay.frame=scene.coordinateSpace.bounds;}
+ }
+ // Legacy iOS 12 and modern apps without scenes both use their own window.
+ if(!overlay)overlay=[[UIWindow alloc]initWithFrame:origin.screen.bounds];
  // Render only the recognized word locally. Never capture the surrounding app.
  NSString *word=[selected stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
- UIFont *font=[UIFont systemFontOfSize:webFontSize>0?MIN(80,MAX(8,webFontSize)):17];UIColor *color=UIColor.labelColor;
+ UIFont *font=[UIFont systemFontOfSize:webFontSize>0?MIN(80,MAX(8,webFontSize)):17];UIColor *color=UIColor.blackColor;if(@available(iOS 13.0,*))color=UIColor.labelColor;
  if([source isKindOfClass:UITextView.class]){font=((UITextView *)source).font?:font;color=((UITextView *)source).textColor?:color;}
  else if([source isKindOfClass:UITextField.class]){font=((UITextField *)source).font?:font;color=((UITextField *)source).textColor?:color;}
  CGRect visible=UsableRect(selectedRect)?CGRectIntersection(selectedRect,source.bounds):CGRectNull;
@@ -304,7 +315,7 @@ static void ShowGame(UIView *source,NSString *selected,CGRect selectedRect,CGFlo
   }];
  }
  previousWindow=origin;
- gameWindow=[[UIWindow alloc]initWithWindowScene:scene];gameWindow.frame=scene.coordinateSpace.bounds;gameWindow.windowLevel=UIWindowLevelNormal+5;gameWindow.overrideUserInterfaceStyle=UIUserInterfaceStyleDark;
+ gameWindow=overlay;gameWindow.windowLevel=UIWindowLevelNormal+5;if(@available(iOS 13.0,*))gameWindow.overrideUserInterfaceStyle=UIUserInterfaceStyleDark;
  SBGameController *controller=[SBGameController new];controller.entryWord=word;controller.entryImage=wordImage;controller.entryRect=UsableRect(originRect)?[gameWindow convertRect:originRect fromWindow:origin]:CGRectNull;
  [origin endEditing:YES];gameWindow.rootViewController=controller;[gameWindow makeKeyAndVisible];
 }
@@ -370,6 +381,6 @@ static void CheckSelection(UIView<UITextInput> *view) {
 %ctor {@autoreleasepool {
  NSString *bundle=NSBundle.mainBundle.bundleIdentifier;NSString *path=NSBundle.mainBundle.bundlePath;
  if(![path hasSuffix:@".app"]||[bundle isEqualToString:@"com.apple.springboard"]||[bundle isEqualToString:@"com.apple.Preferences"])return;
- if(NSProcessInfo.processInfo.operatingSystemVersion.majorVersion!=16)return;
+ if(NSProcessInfo.processInfo.operatingSystemVersion.majorVersion<12)return;
  %init(SelectionHooks);
 }}
