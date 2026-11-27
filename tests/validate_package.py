@@ -7,7 +7,9 @@ expected_arch = 'iphoneos-arm64' if variant == 'rootless' else 'iphoneos-arm'
 def field(name):
  return subprocess.check_output(['dpkg-deb', '-f', filename, name], text=True).strip()
 assert field('Architecture') == expected_arch, 'Wrong package architecture'
-assert field('Version') == '1.1.0', 'Wrong package version'
+control = (Path(__file__).resolve().parents[1] / 'control').read_text()
+expected_version = next(line.split(':', 1)[1].strip() for line in control.splitlines() if line.startswith('Version:'))
+assert field('Version') == expected_version, 'Wrong package version'
 with tempfile.TemporaryDirectory() as directory:
  subprocess.run(['dpkg-deb', '-x', filename, directory], check=True)
  relative = 'Library/MobileSubstrate/DynamicLibraries/SelectBlocks.dylib'
