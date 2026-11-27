@@ -6,13 +6,13 @@ Author: Local Build
 Section: Tweaks
 Depends: firmware (>= 12.0), firmware (<< 14.0), mobilesubstrate
 Architecture: iphoneos-arm
-Version: 1.1.0
-Installed-Size: 132
-Filename: pool/SelectBlocks_1.1.0_rootful-legacy.deb
-Size: 33866
-MD5sum: 099749f1bb8d2dc79bce5bf10ad85551
-SHA256: 0e78986e0c5a4da79cb8d22c804564a364c8a8f13d2f695c0c58b4b5f6a8e74b
-SHA512: a4040a7c2110b674bcd725424b18a2748db5ed6b5da9036557fe1e98c159604093ecd4afe369b3e4ef3a891f5ae1fb3cf1240dcbaee139074ba0b1a7b0b74f46
+Version: 1.2.0
+Installed-Size: 148
+Filename: pool/SelectBlocks_1.2.0_rootful-legacy.deb
+Size: 35934
+MD5sum: 3982e1f0462bd5a597d2b90f20356a3e
+SHA256: 919d238c46026415cb190afa598dee61b9529f7d93d2c8eee425dba45e039ee9
+SHA512: 0cba186643a8b75182c09ce8b20eaa692417bcdd9080543585a73b01873d96777d325baf5f2710ed3f5bfcbb81b9d00c497d96cb207d009b00ae339baea25fc6
 Depiction: https://dinaxy148822822-create.github.io/SelectBlocks/legacy/
 Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/legacy/package-icon-290af1fe6368.png
 

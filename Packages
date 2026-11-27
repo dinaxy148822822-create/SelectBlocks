@@ -6,13 +6,13 @@ Author: Local Build
 Section: Tweaks
 Depends: firmware (>= 15.0), mobilesubstrate
 Architecture: iphoneos-arm64
-Version: 1.1.0
+Version: 1.2.0
 Installed-Size: 308
-Filename: pool/SelectBlocks_1.1.0_rootless.deb
-Size: 46318
-MD5sum: 4a6d353df370bdea215510dc1667fbcd
-SHA256: 411e6e81f0fe6c2e085ec47968411b79922c0fd8adc25db632de0338b5cc7f63
-SHA512: d9f3e1873f1b775216f8a7ba02c90b44bbb3bc857a214d7907cdf698d08c1e044f2e8f4d1704f79b9172e7ffe85887ff9fb9c4f6f31947dbc6d150dc2e864b84
+Filename: pool/SelectBlocks_1.2.0_rootless.deb
+Size: 49468
+MD5sum: 87688294ffcbb0891612536ed4e9f68e
+SHA256: 15a56a710f85aedd2c41856c023401571648c8ea7f08621ff5dc61bd3c96e42e
+SHA512: dbc209c8785e1f7395f5cfb30567ce21c4640630593b4ac22c7270302b334d6baf5491723795bf39ce872e1187b97f8f3df170a3d41a2a4d54f34110197e0f5e
 Depiction: https://dinaxy148822822-create.github.io/SelectBlocks/
 Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/package-icon-290af1fe6368.png
 

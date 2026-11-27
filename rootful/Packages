@@ -6,13 +6,13 @@ Author: Local Build
 Section: Tweaks
 Depends: firmware (>= 14.0), mobilesubstrate
 Architecture: iphoneos-arm
-Version: 1.1.0
+Version: 1.2.0
 Installed-Size: 308
-Filename: pool/SelectBlocks_1.1.0_rootful.deb
-Size: 46326
-MD5sum: ae02e0319374a8b397513ec72bbfe2f3
-SHA256: d7bebf8f6b630414b90362c11d5eb2dccaafe9e487f45a30b46814e8e203b039
-SHA512: a155635ad6254a901449f911dd59f72f24c85ee2499f592399b83613d917844bb33970707a2f73eeee800d9006e89056084a5dd6c3f5eb5049d378dc0d824725
+Filename: pool/SelectBlocks_1.2.0_rootful.deb
+Size: 49520
+MD5sum: 76ad7fdbd36451f17c75befde5357074
+SHA256: 91bae354dd29bb45e9a88e664a5303c92d7770837800d5db3c3e3d4e11feba23
+SHA512: b490b8fc5519b9a4e4fc7546e2855ac8bb6377b8550b476525d3deb93a43dbb7fe354796f6d3400455974f8c286225210654a63b94ea82c040c13e602111355f
 Depiction: https://dinaxy148822822-create.github.io/SelectBlocks/rootful/
 Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/rootful/package-icon-290af1fe6368.png
 
