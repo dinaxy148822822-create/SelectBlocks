@@ -68,9 +68,9 @@ def validate_release_fields(text, expected_arch):
         raise ValueError('Release architecture does not match its channel')
 
 
-def png_icon(size=128):
+def png_icon(size=128, use_custom=True):
     custom = Path(__file__).with_name('icon.png.b64')
-    if custom.exists():
+    if use_custom and custom.exists():
         data = base64.b64decode(custom.read_text().strip(), validate=True)
         if not data.startswith(b'\x89PNG\r\n\x1a\n'):
             raise ValueError('Custom repository icon is not PNG')
@@ -99,6 +99,9 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
     icon_data = png_icon()
     icon_name = 'icon-' + hashlib.sha256(icon_data).hexdigest()[:12] + '.png'
     (folder / icon_name).write_bytes(icon_data)
+    package_icon_data = png_icon(use_custom=False)
+    package_icon_name = 'package-icon-' + hashlib.sha256(package_icon_data).hexdigest()[:12] + '.png'
+    (folder / package_icon_name).write_bytes(package_icon_data)
     record = dict(meta)
     # These belong to the index; never trust stale values from DEB control data.
     for key in ('Filename', 'Size', 'MD5sum', 'SHA1', 'SHA256', 'SHA512', 'Depiction', 'SileoDepiction', 'Icon'):
@@ -110,15 +113,15 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
         'SHA256': hashlib.sha256(data).hexdigest(),
         'SHA512': hashlib.sha512(data).hexdigest(),
         'Depiction': depiction_url or source_url,
-        'Icon': source_url + 'CydiaIcon.png',
+        'Icon': source_url + package_icon_name,
     })
     package_data = ('\n'.join(k + ': ' + v for k, v in record.items()) + '\n\n').encode()
     (folder / 'Packages').write_bytes(package_data)
     (folder / 'Packages.gz').write_bytes(gzip.compress(package_data, mtime=0))
     (folder / 'Packages.bz2').write_bytes(bz2.compress(package_data))
     release = [
-        'Origin: saya',
-        'Label: saya',
+        'Origin: sayadev',
+        'Label: sayadev',
         'Suite: stable',
         'Codename: selectblocks-' + variant,
         'Version: ' + meta['Version'],
@@ -138,7 +141,7 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
     (folder / 'Release').write_text(release_text)
     for name in ('CydiaIcon.png', 'CydiaIcon@2x.png', 'CydiaIcon@3x.png'):
         (folder / name).write_bytes(icon_data)
-    return {'variant': variant, 'url': source_url, 'version': meta['Version'], 'depends': meta['Depends'], 'file': source_url + 'pool/' + deb.name, 'icon': source_url + icon_name}
+    return {'variant': variant, 'url': source_url, 'version': meta['Version'], 'depends': meta['Depends'], 'file': source_url + 'pool/' + deb.name, 'icon': source_url + icon_name, 'package_icon': source_url + package_icon_name}
 
 
 def make_page(config):
@@ -248,8 +251,8 @@ class RepositoryTests(unittest.TestCase):
                 self.assertIn(hashlib.sha256(raw).hexdigest(), (folder / 'Release').read_text())
                 self.assertEqual(entry['variant'], variant)
                 release_meta = fields((folder / 'Release').read_text())
-                self.assertEqual(release_meta['Origin'], 'saya')
-                self.assertEqual(release_meta['Label'], 'saya')
+                self.assertEqual(release_meta['Origin'], 'sayadev')
+                self.assertEqual(release_meta['Label'], 'sayadev')
                 self.assertTrue((folder / 'CydiaIcon.png').read_bytes().startswith(b'\x89PNG'))
 
     def test_sileo_mandatory_release_components(self):
@@ -259,6 +262,22 @@ class RepositoryTests(unittest.TestCase):
             validate_release_fields(valid.replace('Components: main\n', ''), 'iphoneos-arm64')
         with self.assertRaisesRegex(ValueError, 'architecture'):
             validate_release_fields(valid, 'iphoneos-arm')
+
+    def test_package_and_repository_icons_are_independent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            fixture = root / 'SelectBlocks_0.0-test_rootless.deb'
+            fixture.write_bytes(b'UNIT TEST FIXTURE, NOT AN INSTALLABLE DEB')
+            meta = {'Package': 'local.selectblocks', 'Name': 'SelectBlocks', 'Architecture': 'iphoneos-arm64', 'Version': '0.0-test', 'Depends': 'firmware (>= 15.0), mobilesubstrate'}
+            folder = root / 'site'
+            entry = write_channel(folder, 'rootless', fixture, meta, 'https://example.invalid/')
+            package = fields((folder / 'Packages').read_text())
+            release = fields((folder / 'Release').read_text())
+            self.assertEqual(package['Icon'], entry['package_icon'])
+            self.assertEqual(release['Icon'], entry['icon'])
+            self.assertNotEqual(package['Icon'], release['Icon'])
+            self.assertEqual((folder / entry['package_icon'].rsplit('/', 1)[1]).read_bytes(), png_icon(use_custom=False))
+            self.assertEqual((folder / 'CydiaIcon.png').read_bytes(), png_icon())
 
     def test_html_payload_escaping(self):
         page = make_page({'version': '</script><script>bad</script>'})
