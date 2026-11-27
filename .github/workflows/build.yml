@@ -48,10 +48,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG="v0.1.0-build-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+          VERSION="$(awk '/^Version:/{print $2; exit}' control)"
+          TAG="v${VERSION}-build-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
           gh release create "$TAG" packages/*.deb \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --prerelease \
-            --title "SelectBlocks 0.1.0 — experimental build ${GITHUB_RUN_NUMBER}" \
-            --notes "Экспериментальный rootless-твик для iOS 16. Скачивайте файл .deb из Assets. Сборка не означает проверку работы на iPhone: нативный интерфейс и совместимость с устройством не протестированы. Поддержка выделения зависит от приложения; возможны сбои. Перед установкой убедитесь, что умеете запускать jailbreak без инъекции твиков для удаления пакета. Исходники и ограничения: README-RU.txt в репозитории."
+            --title "SelectBlocks ${VERSION} — experimental build ${GITHUB_RUN_NUMBER}" \
+            --notes "Экспериментальный rootless-твик для iOS 16. Версия 0.2: нативные кнопки снизу, выделенный сброс, анимация появления с поддержкой Reduce Motion, надпись TETRIS и процедурные объёмные текстуры блоков. Скачивайте файл .deb из Assets. Сборка не означает проверку работы на iPhone: нативный интерфейс и совместимость с устройством не протестированы. Поддержка выделения зависит от приложения; возможны сбои. Перед установкой убедитесь, что умеете запускать jailbreak без инъекции твиков для удаления пакета. Исходники и ограничения: README-RU.txt в репозитории."

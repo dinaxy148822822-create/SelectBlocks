@@ -13,24 +13,38 @@ static UIColor *PieceColor(int n) {
  dispatch_once(&once, ^{ colors=@[UIColor.clearColor, [UIColor colorWithRed:.24 green:.80 blue:.90 alpha:1], [UIColor colorWithRed:.95 green:.79 blue:.28 alpha:1], [UIColor colorWithRed:.69 green:.50 blue:.91 alpha:1], [UIColor colorWithRed:.37 green:.79 blue:.58 alpha:1], [UIColor colorWithRed:.93 green:.43 blue:.47 alpha:1], [UIColor colorWithRed:.33 green:.59 blue:.94 alpha:1], [UIColor colorWithRed:.96 green:.62 blue:.32 alpha:1]]; });
  return colors[MAX(0,MIN(7,n))];
 }
+// Original, procedural bevel texture: no bundled artwork or network assets.
+static void DrawBlock(CGRect r, int type) {
+ UIColor *base=PieceColor(type);[base setFill];UIRectFill(r);
+ CGFloat b=MAX(1,floor(r.size.width*.13));
+ [[UIColor colorWithWhite:1 alpha:.40] setFill];
+ UIRectFill(CGRectMake(r.origin.x,r.origin.y,r.size.width,b));
+ UIRectFill(CGRectMake(r.origin.x,r.origin.y,b,r.size.height-b));
+ [[UIColor colorWithWhite:0 alpha:.30] setFill];
+ UIRectFill(CGRectMake(r.origin.x,CGRectGetMaxY(r)-b,r.size.width,b));
+ UIRectFill(CGRectMake(CGRectGetMaxX(r)-b,r.origin.y+b,b,r.size.height-b));
+ [[UIColor colorWithWhite:1 alpha:.12] setFill];UIRectFill(CGRectInset(r,b*2,b*2));
+}
 @interface SBBoard : UIView
 @property(nonatomic,assign) Game *game;
 @end
 @implementation SBBoard
 - (void)drawRect:(CGRect)rect {
- Game *g=self.game; if(!g)return;
- CGContextRef c=UIGraphicsGetCurrentContext(); CGFloat s=MIN(self.bounds.size.width/10,self.bounds.size.height/20);
+ Game *g=self.game;if(!g)return;CGContextRef c=UIGraphicsGetCurrentContext();
+ CGFloat s=floor(MIN((self.bounds.size.width-4)/10,(self.bounds.size.height-4)/20)*2)/2;
  CGFloat ox=(self.bounds.size.width-s*10)/2,oy=(self.bounds.size.height-s*20)/2;
- [[UIColor colorWithWhite:.07 alpha:1] setFill]; UIRectFill(self.bounds);
+ CGRect field=CGRectMake(ox-2,oy-2,s*10+4,s*20+4);
+ [[UIColor colorWithWhite:.25 alpha:1] setFill];[[UIBezierPath bezierPathWithRoundedRect:field cornerRadius:5] fill];
+ [[UIColor colorWithWhite:.055 alpha:1] setFill];UIRectFill(CGRectInset(field,2,2));
  for(int y=0;y<20;y++)for(int x=0;x<10;x++){
-  CGRect r=CGRectMake(ox+x*s+.7,oy+y*s+.7,s-1.4,s-1.4);
-  [(g->board[y][x]?PieceColor(g->board[y][x]):[UIColor colorWithWhite:.12 alpha:1]) setFill];UIRectFill(r);
+  CGRect r=CGRectMake(ox+x*s+.6,oy+y*s+.6,s-1.2,s-1.2);
+  if(g->board[y][x])DrawBlock(r,g->board[y][x]);else{[[UIColor colorWithWhite:.095 alpha:1] setFill];UIRectFill(r);}
  }
  if(!g->over){int ghost=g->y;while(fits(g,g->x,ghost+1,g->rot))ghost++;
   for(int pass=0;pass<2;pass++)for(int j=0;j<4;j++)for(int i=0;i<4;i++)if(cell(g->type,g->rot,i,j)){
    int y=(pass?g->y:ghost)+j;if(y<0)continue;
-   CGRect r=CGRectMake(ox+(g->x+i)*s+1,oy+y*s+1,s-2,s-2);
-   if(pass){[PieceColor(g->type+1) setFill];UIRectFill(r);}else{[PieceColor(g->type+1) setStroke];CGContextSetLineWidth(c,1.5);CGContextStrokeRect(c,CGRectInset(r,1,1));}
+   CGRect r=CGRectMake(ox+(g->x+i)*s+.6,oy+y*s+.6,s-1.2,s-1.2);
+   if(pass)DrawBlock(r,g->type+1);else{[[PieceColor(g->type+1) colorWithAlphaComponent:.65] setStroke];CGContextSetLineWidth(c,1);CGContextStrokeRect(c,CGRectInset(r,1,1));}
   }
  }
 }
@@ -41,16 +55,26 @@ static UIColor *PieceColor(int n) {
 @end
 @implementation SBPreview
 - (void)drawRect:(CGRect)r {
- [self.title drawAtPoint:CGPointMake(0,1) withAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:14 weight:UIFontWeightMedium],NSForegroundColorAttributeName:UIColor.lightGrayColor}];
- if(self.type<0)return;
- CGFloat s=10;for(int y=0;y<4;y++)for(int x=0;x<4;x++)if(cell(self.type,0,x,y)){
- [PieceColor(self.type+1) setFill];UIRectFill(CGRectMake(self.bounds.size.width-46+x*s,1+y*s,s-1,s-1));}
+ [self.title drawAtPoint:CGPointMake(0,0) withAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:14 weight:UIFontWeightMedium],NSForegroundColorAttributeName:[UIColor colorWithWhite:.72 alpha:1]}];
+ if(self.type<0){[@"—" drawAtPoint:CGPointMake(0,20) withAttributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16],NSForegroundColorAttributeName:UIColor.grayColor}];return;}
+ CGFloat size=10;for(int y=0;y<4;y++)for(int x=0;x<4;x++)if(cell(self.type,0,x,y))DrawBlock(CGRectMake(x*size,21+y*size,size-1,size-1),self.type+1);
+}
+@end
+@interface SBControl : UIButton
+@end
+@implementation SBControl
+- (void)setHighlighted:(BOOL)value {
+ [super setHighlighted:value];
+ if(UIAccessibilityIsReduceMotionEnabled())return;
+ [UIView animateWithDuration:.10 delay:0 options:UIViewAnimationOptionBeginFromCurrentState|UIViewAnimationOptionAllowUserInteraction animations:^{self.transform=value?CGAffineTransformMakeScale(.95,.95):CGAffineTransformIdentity;} completion:nil];
 }
 @end
 @interface SBGameController : UIViewController {
- Game _game; BOOL _paused; double _lastTick,_fall,_lock,_pressedAt; int _pressed; int _best;
+ Game _game; BOOL _paused; double _lastTick,_fall,_lock,_pressedAt; int _pressed; int _best; BOOL _appeared; BOOL _closing;
 }
 @property(nonatomic,strong) NSTimer *timer;
+@property(nonatomic,strong) UIStackView *surface;
+@property(nonatomic,strong) UIButton *pauseButton;
 @property(nonatomic,strong) SBBoard *board;
 @property(nonatomic,strong) UILabel *stats;
 @property(nonatomic,strong) UILabel *status;
@@ -70,33 +94,59 @@ static UIColor *PieceColor(int n) {
   if(valid){_game=temp;if(!_game.over&&!fits(&_game,_game.x,_game.y,_game.rot))valid=NO;}
  }
  if(!valid)gameNew(&_game,arc4random());_paused=valid&&!_game.over;_best=(int)[d integerForKey:@"SelectBlocks.best.v1"];
- UIScrollView *scroll=[[UIScrollView alloc]init];scroll.translatesAutoresizingMaskIntoConstraints=NO;[self.view addSubview:scroll];
- UIStackView *root=[[UIStackView alloc]init];root.axis=UILayoutConstraintAxisVertical;root.spacing=8;root.translatesAutoresizingMaskIntoConstraints=NO;[scroll addSubview:root];
+ UIScrollView *scroll=[[UIScrollView alloc]init];scroll.translatesAutoresizingMaskIntoConstraints=NO;scroll.delaysContentTouches=NO;scroll.showsVerticalScrollIndicator=NO;[self.view addSubview:scroll];
+ UIStackView *root=[[UIStackView alloc]init];self.surface=root;root.axis=UILayoutConstraintAxisVertical;root.spacing=8;root.translatesAutoresizingMaskIntoConstraints=NO;[scroll addSubview:root];
  UILayoutGuide *safe=self.view.safeAreaLayoutGuide;
  [NSLayoutConstraint activateConstraints:@[[scroll.leadingAnchor constraintEqualToAnchor:safe.leadingAnchor],[scroll.trailingAnchor constraintEqualToAnchor:safe.trailingAnchor],[scroll.topAnchor constraintEqualToAnchor:safe.topAnchor],[scroll.bottomAnchor constraintEqualToAnchor:safe.bottomAnchor],[root.leadingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.leadingAnchor constant:16],[root.trailingAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.trailingAnchor constant:-16],[root.topAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.topAnchor constant:8],[root.bottomAnchor constraintEqualToAnchor:scroll.contentLayoutGuide.bottomAnchor constant:-8],[root.widthAnchor constraintEqualToAnchor:scroll.frameLayoutGuide.widthAnchor constant:-32],[root.heightAnchor constraintGreaterThanOrEqualToAnchor:scroll.frameLayoutGuide.heightAnchor constant:-16]]];
  NSLayoutConstraint *preferredHeight=[root.heightAnchor constraintEqualToAnchor:scroll.frameLayoutGuide.heightAnchor constant:-16];preferredHeight.priority=750;preferredHeight.active=YES;
- UILabel *title=[[UILabel alloc]init];title.text=@"SELECT BLOCKS";title.font=[UIFont monospacedSystemFontOfSize:20 weight:UIFontWeightBold];title.textColor=UIColor.whiteColor;
- UIButton *close=[self button:@"Закрыть" action:^{[weakSelf closeGame];}];
- UIStackView *header=[[UIStackView alloc]initWithArrangedSubviews:@[title,close]];header.spacing=8;[header.heightAnchor constraintEqualToConstant:44].active=YES;[root addArrangedSubview:header];
- self.stats=[[UILabel alloc]init];self.stats.font=[UIFont monospacedDigitSystemFontOfSize:14 weight:UIFontWeightMedium];self.stats.textColor=UIColor.whiteColor;self.stats.numberOfLines=2;[self.stats.heightAnchor constraintEqualToConstant:40].active=YES;[root addArrangedSubview:self.stats];
- self.hold=[[SBPreview alloc]init];self.hold.title=@"HOLD";
- NSMutableArray *previews=[NSMutableArray array];for(int i=0;i<3;i++){SBPreview *p=[[SBPreview alloc]init];p.title=i==0?@"NEXT":@"";p.backgroundColor=UIColor.clearColor;[previews addObject:p];}self.previews=previews;
- self.hold.backgroundColor=UIColor.clearColor;
- UIStackView *previewRow=[[UIStackView alloc]initWithArrangedSubviews:@[self.hold,previews[0],previews[1],previews[2]]];previewRow.spacing=8;previewRow.distribution=UIStackViewDistributionFillEqually;[previewRow.heightAnchor constraintEqualToConstant:40].active=YES;[root addArrangedSubview:previewRow];
- self.board=[[SBBoard alloc]init];self.board.game=&_game;[self.board.heightAnchor constraintGreaterThanOrEqualToConstant:160].active=YES;[root addArrangedSubview:self.board];
- self.status=[[UILabel alloc]init];self.status.font=[UIFont systemFontOfSize:14 weight:UIFontWeightMedium];self.status.textColor=UIColor.lightGrayColor;self.status.textAlignment=NSTextAlignmentCenter;[self.status.heightAnchor constraintEqualToConstant:22].active=YES;[root addArrangedSubview:self.status];
- NSArray *row1=@[[self repeatButton:@"◀" tag:0],[self button:@"↶" action:^{[weakSelf rotate:-1];}],[self button:@"↷" action:^{[weakSelf rotate:1];}],[self repeatButton:@"▶" tag:1]];
- NSArray *row2=@[[self button:@"HOLD" action:^{[weakSelf holdAction];}],[self repeatButton:@"▼" tag:2],[self button:@"Сброс" action:^{[weakSelf dropAction];}]];
- NSArray *row3=@[[self button:@"Пауза / ▶" action:^{[weakSelf pauseAction];}],[self button:@"Заново" action:^{[weakSelf restartAction];}]];
- for(NSArray *buttons in @[row1,row2,row3]){UIStackView *r=[[UIStackView alloc]initWithArrangedSubviews:buttons];r.spacing=8;r.distribution=UIStackViewDistributionFillEqually;[r.heightAnchor constraintEqualToConstant:44].active=YES;[root addArrangedSubview:r];}
+ UILabel *title=[[UILabel alloc]init];UIFont *font=[UIFont systemFontOfSize:34 weight:UIFontWeightBlack];UIFontDescriptor *fd=[font.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];if(fd)font=[UIFont fontWithDescriptor:fd size:34];
+ title.attributedText=[[NSAttributedString alloc]initWithString:@"TETRIS" attributes:@{NSFontAttributeName:font,NSKernAttributeName:@(-1.5),NSForegroundColorAttributeName:[UIColor colorWithRed:1 green:.66 blue:.20 alpha:1],NSStrokeColorAttributeName:[UIColor colorWithWhite:.98 alpha:1],NSStrokeWidthAttributeName:@(-2)}];title.accessibilityLabel=@"Tetris";
+ UILabel *edition=[[UILabel alloc]init];edition.text=@"CLASSIC\n10 × 20";edition.textAlignment=NSTextAlignmentRight;edition.numberOfLines=2;edition.font=[UIFont monospacedSystemFontOfSize:14 weight:UIFontWeightMedium];edition.textColor=[UIColor colorWithWhite:.65 alpha:1];
+ UIStackView *header=[[UIStackView alloc]initWithArrangedSubviews:@[title,edition]];[header.heightAnchor constraintEqualToConstant:44].active=YES;[root addArrangedSubview:header];
+ self.stats=[[UILabel alloc]init];self.stats.font=[UIFont monospacedDigitSystemFontOfSize:14 weight:UIFontWeightMedium];self.stats.textColor=UIColor.whiteColor;self.stats.numberOfLines=0;[self.stats.heightAnchor constraintEqualToConstant:104].active=YES;
+ self.hold=[[SBPreview alloc]init];self.hold.title=@"ЗАПАС";self.hold.backgroundColor=UIColor.clearColor;[self.hold.heightAnchor constraintEqualToConstant:48].active=YES;
+ NSMutableArray *previews=[NSMutableArray array];for(int i=0;i<3;i++){SBPreview *p=[[SBPreview alloc]init];p.title=[NSString stringWithFormat:@"ДАЛЕЕ %d",i+1];p.backgroundColor=UIColor.clearColor;[p.heightAnchor constraintEqualToConstant:48].active=YES;[previews addObject:p];}self.previews=previews;
+ UIStackView *sidebar=[[UIStackView alloc]initWithArrangedSubviews:@[self.stats,self.hold,previews[0],previews[1],previews[2]]];sidebar.axis=UILayoutConstraintAxisVertical;sidebar.spacing=8;[sidebar.widthAnchor constraintEqualToConstant:80].active=YES;
+ UIView *sideSpace=[[UIView alloc]init];[sidebar addArrangedSubview:sideSpace];
+ self.board=[[SBBoard alloc]init];self.board.backgroundColor=UIColor.clearColor;self.board.game=&_game;
+ UIStackView *stage=[[UIStackView alloc]initWithArrangedSubviews:@[sidebar,self.board]];stage.spacing=8;[stage.heightAnchor constraintGreaterThanOrEqualToConstant:340].active=YES;[root addArrangedSubview:stage];
+ self.status=[[UILabel alloc]init];self.status.font=[UIFont systemFontOfSize:14 weight:UIFontWeightMedium];self.status.textColor=[UIColor colorWithWhite:.72 alpha:1];self.status.textAlignment=NSTextAlignmentCenter;self.status.adjustsFontSizeToFitWidth=YES;self.status.minimumScaleFactor=.9;[self.status.heightAnchor constraintEqualToConstant:22].active=YES;[root addArrangedSubview:self.status];
+ // All game actions, including hard drop, remain in the lower thumb zone.
+ UIButton *left=[self repeatButton:@"Влево" symbol:@"arrow.left" tag:0];
+ UIButton *right=[self repeatButton:@"Вправо" symbol:@"arrow.right" tag:1];
+ UIButton *ccw=[self button:@"Поворот" symbol:@"arrow.counterclockwise" prominent:NO action:^{[weakSelf rotate:-1];}];ccw.accessibilityLabel=@"Повернуть против часовой стрелки";
+ UIButton *cw=[self button:@"Поворот" symbol:@"arrow.clockwise" prominent:NO action:^{[weakSelf rotate:1];}];cw.accessibilityLabel=@"Повернуть по часовой стрелке";
+ NSArray *row1=@[left,ccw,cw,right];
+ NSArray *row2=@[[self button:@"Запас" symbol:@"arrow.left.arrow.right" prominent:NO action:^{[weakSelf holdAction];}],[self repeatButton:@"Вниз" symbol:@"chevron.down" tag:2],[self button:@"Сброс" symbol:@"arrow.down.to.line" prominent:YES action:^{[weakSelf dropAction];}]];
+ self.pauseButton=[self button:@"Пауза" symbol:@"pause.fill" prominent:NO action:^{[weakSelf pauseAction];}];
+ NSArray *row3=@[self.pauseButton,[self button:@"Заново" symbol:@"arrow.clockwise" prominent:NO action:^{[weakSelf restartAction];}],[self button:@"Выйти" symbol:@"xmark" prominent:NO action:^{[weakSelf closeGame];}]];
+ // Use only symbols available on iOS 16 (fallback is supplied by button:).
+ for(UIButton *b in row3){UIButtonConfiguration *c=b.configuration;c.imagePlacement=NSDirectionalRectEdgeLeading;c.imagePadding=5;c.image=[c.image imageByApplyingSymbolConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:14 weight:UIImageSymbolWeightSemibold]];b.configuration=c;}
+ int index=0;for(NSArray *buttons in @[row1,row2,row3]){UIStackView *r=[[UIStackView alloc]initWithArrangedSubviews:buttons];r.spacing=8;r.distribution=UIStackViewDistributionFillEqually;[r.heightAnchor constraintEqualToConstant:index==0?60:(index==1?56:48)].active=YES;[root addArrangedSubview:r];index++;}
  [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(background:) name:UIApplicationWillResignActiveNotification object:nil];
  self.timer=[NSTimer timerWithTimeInterval:.05 repeats:YES block:^(NSTimer *t){[weakSelf tick];}];[NSRunLoop.mainRunLoop addTimer:self.timer forMode:NSRunLoopCommonModes];[self refresh];
 }
-- (UIButton *)button:(NSString *)name action:(void(^)(void))action {
- UIButton *b=[UIButton buttonWithType:UIButtonTypeSystem];b.backgroundColor=[UIColor colorWithWhite:.17 alpha:1];b.layer.cornerRadius=8;[b setTitle:name forState:UIControlStateNormal];[b setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];b.titleLabel.font=[UIFont systemFontOfSize:16 weight:UIFontWeightSemibold];b.accessibilityLabel=name;
+- (void)viewDidAppear:(BOOL)animated {
+ [super viewDidAppear:animated];if(_appeared)return;_appeared=YES;
+ BOOL reduce=UIAccessibilityIsReduceMotionEnabled();self.surface.alpha=0;
+ if(!reduce)self.surface.transform=CGAffineTransformConcat(CGAffineTransformMakeTranslation(0,28),CGAffineTransformMakeScale(.97,.97));
+ [UIView animateWithDuration:reduce?.15:.42 delay:0 usingSpringWithDamping:.88 initialSpringVelocity:.25 options:UIViewAnimationOptionAllowUserInteraction animations:^{self.surface.alpha=1;self.surface.transform=CGAffineTransformIdentity;} completion:nil];
+}
+- (UIButton *)button:(NSString *)name symbol:(NSString *)symbol prominent:(BOOL)prominent action:(void(^)(void))action {
+ SBControl *b=[SBControl buttonWithType:UIButtonTypeCustom];
+ UIButtonConfiguration *config=[UIButtonConfiguration filledButtonConfiguration];
+ config.baseBackgroundColor=prominent?[UIColor colorWithRed:.16 green:.43 blue:.84 alpha:1]:[UIColor colorWithWhite:.16 alpha:1];config.baseForegroundColor=UIColor.whiteColor;
+ config.background.cornerRadius=12;config.background.strokeColor=[UIColor colorWithWhite:1 alpha:prominent?.18:.09];config.background.strokeWidth=.5;
+ UIImage *image=[UIImage systemImageNamed:symbol];if(!image)image=[UIImage systemImageNamed:@"arrow.clockwise"];
+ config.image=[image imageByApplyingSymbolConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:19 weight:UIImageSymbolWeightSemibold]];config.imagePlacement=NSDirectionalRectEdgeTop;config.imagePadding=3;
+ config.attributedTitle=[[NSAttributedString alloc]initWithString:name attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:14 weight:UIFontWeightSemibold]}];config.contentInsets=NSDirectionalEdgeInsetsMake(5,3,5,3);b.configuration=config;b.accessibilityLabel=name;b.exclusiveTouch=YES;
  [b addAction:[UIAction actionWithHandler:^(__kindof UIAction *a){action();}] forControlEvents:UIControlEventTouchUpInside];return b;
 }
-- (UIButton *)repeatButton:(NSString *)title tag:(NSInteger)tag {UIButton *b=[self button:title action:^{}];b.tag=tag;[b addTarget:self action:@selector(press:) forControlEvents:UIControlEventTouchDown];[b addTarget:self action:@selector(releasePress:) forControlEvents:UIControlEventTouchUpInside|UIControlEventTouchUpOutside|UIControlEventTouchCancel|UIControlEventTouchDragExit];return b;}
+- (UIButton *)repeatButton:(NSString *)title symbol:(NSString *)symbol tag:(NSInteger)tag {
+ UIButton *b=[self button:title symbol:symbol prominent:NO action:^{}];b.tag=tag;
+ [b addTarget:self action:@selector(press:) forControlEvents:UIControlEventTouchDown];
+ [b addTarget:self action:@selector(releasePress:) forControlEvents:UIControlEventTouchUpInside|UIControlEventTouchUpOutside|UIControlEventTouchCancel|UIControlEventTouchDragExit];return b;
+}
 - (void)press:(UIButton *)b{if(_paused||_game.over)return;_pressed=(int)b.tag;_pressedAt=NSDate.timeIntervalSinceReferenceDate;[self step:_pressed];}
 - (void)releasePress:(id)sender{_pressed=-1;}
 - (void)step:(int)action {if(_paused||_game.over)return;if(action==2){if(movePiece(&_game,0,1))_game.score++;}else movePiece(&_game,action==0?-1:1,0);[self refresh];}
@@ -114,10 +164,25 @@ static UIColor *PieceColor(int n) {
  if(!fits(&_game,_game.x,_game.y+1,_game.rot)){_lock+=dt;if(_lock>=.45){lockPiece(&_game);_lock=0;_fall=0;[self persist];}}else _lock=0;
  [self refresh];
 }
-- (void)refresh {self.stats.text=[NSString stringWithFormat:@"Очки %d   Рекорд %d\nУровень %d   Линии %d",_game.score,MAX(_best,_game.score),_game.level,_game.lines];self.status.text=_game.over?@"Игра окончена · нажми «Заново»":(_paused?@"ПАУЗА · нажми «Пауза / ▶»":@"▼ мягкий спуск · Сброс — мгновенный");self.board.alpha=_paused?.12:1;self.hold.type=_game.held;[self.hold setNeedsDisplay];for(int i=0;i<3;i++){self.previews[i].type=_game.next[i];[self.previews[i] setNeedsDisplay];}[self.board setNeedsDisplay];}
+- (void)refresh {
+ self.stats.text=[NSString stringWithFormat:@"ОЧКИ\n%d\nРЕКОРД\n%d\nУРОВ. %d\nЛИНИИ %d",_game.score,MAX(_best,_game.score),_game.level,_game.lines];
+ self.status.text=_game.over?@"Игра окончена · начни заново":(_paused?@"На паузе · нажми «Играть»":@"Удерживай стрелки для движения");
+ self.board.alpha=_paused?.20:1;self.hold.type=_game.held;[self.hold setNeedsDisplay];
+ UIButtonConfiguration *config=self.pauseButton.configuration;
+ NSString *title=_paused?@"Играть":@"Пауза";
+ config.attributedTitle=[[NSAttributedString alloc]initWithString:title attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:14 weight:UIFontWeightSemibold]}];
+ config.image=[[UIImage systemImageNamed:_paused?@"play.fill":@"pause.fill"] imageByApplyingSymbolConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:14 weight:UIImageSymbolWeightSemibold]];self.pauseButton.configuration=config;self.pauseButton.accessibilityLabel=title;
+ for(int i=0;i<3;i++){self.previews[i].type=_game.next[i];[self.previews[i] setNeedsDisplay];}[self.board setNeedsDisplay];
+}
 - (void)persist {NSUserDefaults *d=NSUserDefaults.standardUserDefaults;_best=MAX(_best,_game.score);[d setInteger:_best forKey:@"SelectBlocks.best.v1"];[d setObject:[NSData dataWithBytes:&_game length:sizeof _game] forKey:@"SelectBlocks.state.v1"];}
 - (void)background:(NSNotification *)n{_paused=YES;_pressed=-1;[self persist];[self refresh];}
-- (void)closeGame {[self persist];[self.timer invalidate];self.timer=nil;[NSNotificationCenter.defaultCenter removeObserver:self];gameWindow.hidden=YES;gameWindow.rootViewController=nil;gameWindow=nil;[previousWindow makeKeyWindow];lastClose=NSDate.timeIntervalSinceReferenceDate;}
+- (void)closeGame {
+ if(_closing)return;_closing=YES;[self persist];[self.timer invalidate];self.timer=nil;[NSNotificationCenter.defaultCenter removeObserver:self];self.view.userInteractionEnabled=NO;
+ UIWindow *closingWindow=gameWindow;BOOL reduce=UIAccessibilityIsReduceMotionEnabled();
+ [UIView animateWithDuration:reduce?.12:.20 animations:^{self.surface.alpha=0;if(!reduce)self.surface.transform=CGAffineTransformMakeTranslation(0,24);} completion:^(BOOL finished){
+  closingWindow.hidden=YES;closingWindow.rootViewController=nil;if(gameWindow==closingWindow)gameWindow=nil;[previousWindow makeKeyWindow];lastClose=NSDate.timeIntervalSinceReferenceDate;
+ }];
+}
 - (void)dealloc {[self.timer invalidate];[NSNotificationCenter.defaultCenter removeObserver:self];}
 @end
 
