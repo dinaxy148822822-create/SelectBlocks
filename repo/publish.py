@@ -11,7 +11,7 @@ import sys
 import tempfile
 import time
 import urllib.request
-from build import CHANNELS
+from build import CHANNELS, fields, validate_release_fields
 
 site = Path(sys.argv[1]).resolve()
 repository = os.environ['GITHUB_REPOSITORY']
@@ -64,6 +64,8 @@ with tempfile.TemporaryDirectory(prefix='selectblocks-apt-') as temp:
                 with urllib.request.urlopen(request, timeout=8) as response:
                     status = response.status
                     actual = response.read(50 * 1024 * 1024)
+                if url.endswith('/Release'):
+                    validate_release_fields(actual.decode('utf-8'), fields(expected.decode('utf-8'))['Architectures'])
                 if status != 200 or actual != expected:
                     raise ValueError('HTTP ' + str(status) + ': payload differs from validated artifact')
                 return True, '| 200 · SHA256 verified | ' + url + ' |'

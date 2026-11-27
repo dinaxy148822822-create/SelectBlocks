@@ -57,6 +57,16 @@ def validate_metadata(meta, variant):
         raise ValueError('Firmware requirements missing')
 
 
+def validate_release_fields(text, expected_arch):
+    # Matches the mandatory Release-field gates in Sileo RepoManager.swift.
+    meta = fields(text)
+    for key in ('Origin', 'Label', 'Architectures', 'Components', 'SHA256'):
+        if not meta.get(key, '').strip():
+            raise ValueError('Release missing mandatory field: ' + key)
+    if expected_arch not in meta['Architectures'].split():
+        raise ValueError('Release architecture does not match its channel')
+
+
 def png_icon(size=128):
     def chunk(tag, data):
         return struct.pack('!I', len(data)) + tag + data + struct.pack('!I', zlib.crc32(tag + data) & 0xffffffff)
@@ -104,6 +114,7 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
         'Version: ' + meta['Version'],
         'Date: ' + email.utils.format_datetime(datetime.datetime.now(datetime.timezone.utc), usegmt=True),
         'Architectures: ' + CHANNELS[variant]['arch'],
+        'Components: main',
         'Description: SelectBlocks ' + CHANNELS[variant]['title'] + ' packages; unsigned metadata over HTTPS',
     ]
     for label, algorithm in [('MD5Sum', 'md5'), ('SHA256', 'sha256'), ('SHA512', 'sha512')]:
@@ -111,7 +122,9 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
         for name in ('Packages', 'Packages.gz', 'Packages.bz2'):
             content = (folder / name).read_bytes()
             release.append(' ' + hashlib.new(algorithm, content).hexdigest() + ' ' + str(len(content)) + ' ' + name)
-    (folder / 'Release').write_text('\n'.join(release) + '\n')
+    release_text = '\n'.join(release) + '\n'
+    validate_release_fields(release_text, CHANNELS[variant]['arch'])
+    (folder / 'Release').write_text(release_text)
     (folder / 'CydiaIcon.png').write_bytes(png_icon())
     return {'variant': variant, 'url': source_url, 'version': meta['Version'], 'depends': meta['Depends'], 'file': source_url + 'pool/' + deb.name}
 
@@ -223,6 +236,14 @@ class RepositoryTests(unittest.TestCase):
                 self.assertIn(hashlib.sha256(raw).hexdigest(), (folder / 'Release').read_text())
                 self.assertEqual(entry['variant'], variant)
                 self.assertTrue((folder / 'CydiaIcon.png').read_bytes().startswith(b'\x89PNG'))
+
+    def test_sileo_mandatory_release_components(self):
+        valid = 'Origin: Test\nLabel: Test\nArchitectures: iphoneos-arm64\nComponents: main\nSHA256:\n abc 1 Packages\n'
+        validate_release_fields(valid, 'iphoneos-arm64')
+        with self.assertRaisesRegex(ValueError, 'Components'):
+            validate_release_fields(valid.replace('Components: main\n', ''), 'iphoneos-arm64')
+        with self.assertRaisesRegex(ValueError, 'architecture'):
+            validate_release_fields(valid, 'iphoneos-arm')
 
     def test_html_payload_escaping(self):
         page = make_page({'version': '</script><script>bad</script>'})
