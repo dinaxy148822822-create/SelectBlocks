@@ -1,55 +1,55 @@
-# FAQ and troubleshooting
+# Вопросы и устранение проблем
 
-[Home](../README.md) · [Install](INSTALL.md) · [Compatibility](COMPATIBILITY.md)
+[Главная](../README.md) · [English](en/FAQ.md) · [Установка](INSTALL.md) · [Совместимость](COMPATIBILITY.md)
 
-## Is this an App Store application?
+## Это приложение из App Store?
 
-No. It is a jailbreak tweak loaded into compatible app processes. It cannot run without an appropriate loader and enabled injection.
+Нет. Это jailbreak-твик, загружаемый в подходящие процессы приложений. Для него нужны совместимый загрузчик и разрешённая инъекция.
 
-## Can I add the GitHub URL to Sileo as a source?
+## Можно добавить ссылку GitHub в Sileo как источник?
 
-No APT repository is provided here. Download the `.deb` from a release's **Assets** and install it with a compatible package manager.
+Нет: APT-репозиторий здесь не предоставляется. Скачайте `.deb` из **Assets** нужного релиза и установите через совместимый менеджер.
 
-## Nothing happens when I select the word
+## При выделении ничего не происходит
 
-Check the exact spelling in `TriggerWords.json`, injection settings and the app's editor type. Try a standard non-secure text field. A PDF, canvas, iframe or custom editor may not be supported. A browser's text selection is not guaranteed just because it visually resembles a standard field.
+Проверьте точное написание в `TriggerWords.json`, настройки инъекции и тип редактора. Попробуйте обычное незащищённое текстовое поле. PDF, Canvas, iframe и нестандартные редакторы могут не поддерживаться. Внешнее сходство со стандартным полем не гарантирует совместимость.
 
-## Does it work with my jailbreak or iOS 18?
+## Поддерживаются мой джейлбрейк и iOS 18?
 
-The modern source targets include iOS 18, but successful use on your exact setup is not certified. Choose the correct package layout, architecture and release. There is no Dopamine-version-specific API dependency. See [compatibility](COMPATIBILITY.md).
+iOS 18 входит в диапазон современных целей сборки, но работа конкретной связки не подтверждена автоматически. Нужны правильные архитектура, тип пакета и релиз. Привязки к номеру Dopamine в API нет. Подробнее: [совместимость](COMPATIBILITY.md).
 
-## Why is an older release more restrictive than the README?
+## Почему старый релиз требует другую прошивку?
 
-The README follows the current source branch. Older compiled DEBs retain their original firmware constraints and architectures. Read the notes attached to the release; do not rename or force-install the old package.
+README описывает текущие исходники. Старые DEB сохраняют исходные ограничения и архитектуры. Ориентируйтесь на описание выпуска и не пытайтесь превратить его в новую сборку переименованием.
 
-## The game opens but the word does not fly upward
+## Игра появляется, но слово не перелетает к заголовку
 
-The effect needs a usable selection rectangle. If that geometry is missing, a simple fade is expected. Reduced Motion also disables the flight. Web page scaling and custom fonts can make the best-effort copy differ from the source text.
+Для перелёта нужны координаты выделения. Если их нет, предусмотрено затухание. «Уменьшение движения» тоже отключает перемещение. Масштаб веб-страницы и нестандартный шрифт могут немного менять положение ��опии слова.
 
-## Why are scores and sound settings different in two apps?
+## Почему очки и звук различаются между приложениями?
 
-State is saved independently in each host app. Cross-app synchronization is not implemented.
+Настройки и партия сохраняются отдельно в каждом приложении. Синхронизация между ними не реализована.
 
-## Why is a restored game paused?
+## Почему восстановленная партия на паузе?
 
-Restoring a saved live game starts paused. Press **PLAY** to continue.
+Это предусмотрено: нажмите **PLAY**, чтобы продолжить.
 
-## No sound, or sound is too quiet
+## Нет звука или он тихий
 
-Check **SND / OFF**, the device's silent setting and volume. The effects are short, restrained UI-style tones. No background music is included. The tweak does not force a new audio session or change the system volume; some environments can suppress effects.
+Проверьте **SND / OFF**, беззвучный режим и громкость. Эффекты короткие и негромкие; фоновой музыки нет. Твик не принуждает приложение к новой аудиосессии и не меняет системную громкость. В некоторых окружениях звуки могут подавляться.
 
-## The app crashes or stops opening
+## Приложение падает или не открывается
 
-Disable injection for it, or use your jailbreak's supported no-injection startup and remove SelectBlocks. Restart the affected app. Keep a previous working release for rollback. Include the release, package variant, firmware, loader and host app version in a bug report; redact private data from logs.
+Отключите инъекцию для него либо воспользуйтесь способом запуска своего джейлбрейка без твиков и удалите SelectBlocks. Перезапустите приложение. Для отката пригодится предыдущий рабочий пакет. В отчёте укажите версии и приложите только обезличенный лог.
 
-## Why does the build fail?
+## Почему не собирается пакет?
 
-Open the first failed CI step rather than only the final summary. Toolchain, network, SDK availability, package metadata, branch permissions and an already-existing release tag can all prevent publication. A green portable test is not the same as a successful DEB build.
+Откройте первый красный шаг Actions. Причиной могут быть инструменты сборки, сеть, SDK, метаданные, разрешения или уже существующий тег релиза. Успех переносимых тестов не означает, что DEB успешно собран.
 
-## Is this official Tetris?
+## Это официальный Tetris?
 
-No. It is an independent falling-block implementation with original procedural graphics and sound effects. Commercial recordings, music and artwork are not included. Rotation and scoring do not implement every modern official game rule.
+Нет. Это независимая игра с падающими блоками и собственными процедурными эффектами. Коммерческие записи, музыка и изображения не включены. Реализованы не все правила современных официальных игр.
 
-## Можно писать об ошибках по-русски?
+## На каком языке писать об ошибках?
 
-Да. Заполните [шаблон](https://github.com/dinaxy148822822-create/SelectBlocks/issues/new/choose), укажите версии и шаги воспроизведения. Никогда не прикладывайте токены и личные данные.
+На русском или английском. Заполните [шаблон](https://github.com/dinaxy148822822-create/SelectBlocks/issues/new/choose), укажите версии и шаги. Никогда не публикуйте токены и личные данные.

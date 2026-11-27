@@ -1,34 +1,30 @@
-# Contributing
+# Участие в разработке
 
-Thanks for improving SelectBlocks. **English and Russian reports are welcome.** There is no promised response time or guaranteed acceptance of a change.
+[Главная](README.md) · [English](docs/en/CONTRIBUTING.md)
 
-## Before opening an issue
+Спасибо за помощь проекту! Сообщения на русском и английском приветствуются. Срок ответа и принятие изменения не гарантируются.
 
-Search existing issues, check [compatibility](docs/COMPATIBILITY.md) and read the notes for your exact release. Choose the bug or feature template. Reproduce with a harmless sample word and redact personal data.
+## Перед обращением
 
-A useful report distinguishes package installation, selection detection, game launch and actual gameplay. Include the package variant, exact iOS, device, jailbreak/loader and host app version. A claim that a jailbreak is “supported” needs runtime evidence, not only a changed dependency string.
+Проверьте существующие Issues, [совместимость](docs/COMPATIBILITY.md) и описание своего релиза. Выберите шаблон ошибки или предложения. Для воспроизведения используйте безопасное тестовое слово; удалите личные данные из вложений.
 
-## Development workflow
+Различайте установку, распознавание выделения, открытие игры и сам игровой процесс. Нужны точные версии пакета, iOS, устройства, джейлбрейка/загрузчика и приложения. Одной замены строки зависимости недостаточно для заявления о совместимости.
 
-1. Fork the repository and create a focused branch.
-2. Follow the [build guide](docs/BUILDING.md).
-3. Keep changes small and explain their behavior and trade-offs.
-4. Run relevant portable tests; for UI/injection changes, also report what you could or could not verify on a real device.
-5. Update user-facing docs and the changelog when behavior changes.
-6. Open a pull request with the supplied template. Do not publish releases or bump versions merely to test a PR.
+## Как предложить изменение
 
-## Compatibility discipline
+1. Создайте форк и отдельную ветку для конкретной задачи.
+2. Следуйте [инструкции сборки](docs/BUILDING.md).
+3. Делайте небольшие изменения и объясняйте их поведение и компромиссы.
+4. Запускайте нужные тесты. Для интерфейса и инъекции отдельно укажите, что проверено на устройстве, а что — нет.
+5. Обновляйте документацию и историю изменений, если поведение меняется.
+6. Откройте pull request по шаблону. Не публикуйте релиз и не повышайте версию только ради проверки PR.
 
-Preserve the default rootless build and clean between variants. Keep package metadata, deployment target, actual binary slices and installation prefix consistent. Do not silently broaden firmware requirements, weaken security settings or force injection into excluded/protected processes.
+## Совместимость и стиль
 
-Keep `TriggerWords.h`, `TriggerWords.json` and the web-selection tests in sync. New spellings should be explicit names with positive and negative tests, not unrestricted text commands.
+Сохраняйте стандартную rootless-сборку и очищайте результаты при смене варианта. Согласуйте метаданные, минимальную iOS, архитектуры библиотеки и путь установки. Не расширяйте требования незаметно, не ослабляйте безопасность и не включайте принудительную инъекцию в исключённые процессы.
 
-## Style and licensing
+Держите `TriggerWords.h`, `TriggerWords.json` и веб-тесты согласованными. Для новых названий нужны точные варианты и положительные/отрицательные проверки, а не произвольные текстовые команды.
 
-Follow `.editorconfig`, preserve existing conventions and avoid unrelated formatting churn. Do not commit DEBs, caches, generated build directories, credentials or private crash reports. Maintain the MIT notice in source distributions. Only submit artwork, sound, text and code you have the right to share under the project's terms.
+Соблюдайте `.editorconfig` и существующий стиль. Не добавляйте DEB, кэш, результаты сборки, токены и приватные логи. Сохраняйте уведомление MIT и делитесь только теми ресурсами, на которые у вас есть права.
 
-Security issues are covered in [SECURITY.md](SECURITY.md). Community expectations are in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-
-## По-русски
-
-Перед предложением изменений проверьте текущие ограничения и точную версию пакета. Для ошибок нужны воспроизводимые шаги, версии iOS/джейлбрейка/приложения и обезличенные логи. Проверка сборки не заменяет испытание на устройстве. Пароли, токены, официальные коммерческие ресурсы и чужие личные данные не добавляйте.
+[Безопасность](SECURITY.md) · [Правила сообщества](CODE_OF_CONDUCT.md)

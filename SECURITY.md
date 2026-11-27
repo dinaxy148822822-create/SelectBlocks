@@ -1,21 +1,21 @@
-# Security
+# Безопасность
 
-SelectBlocks runs as injected native code inside a host app. A bug can crash that app or interact poorly with another tweak. A normal release label is not a security audit or a guarantee of compatibility.
+[Главная](README.md) · [English](docs/en/SECURITY.md)
 
-## Reporting a sensitive issue
+SelectBlocks выполняется как нативный код внутри приложения. Ошибка может привести к его сбою или конфликту с другим твиком. Обычная пометка релиза не равна аудиту безопасности.
 
-Do not post access tokens, exploit-ready details involving other users' data, private crash dumps or personal app content in a public issue.
+## Чувствительные отчёты
 
-If GitHub displays **Security → Advisories → Report a vulnerability** for this repository, use that private reporting channel. Its availability depends on repository settings; this document does not imply it has been enabled. If it is unavailable, open a minimal public issue asking the maintainer for a private contact route **without disclosing sensitive details**. A response or remediation timeframe is not guaranteed.
+Не публикуйте токены, приватные дампы, личные данные и готовые к эксплуатации подробности уязвимости, затрагивающей чужие данные, в открытом Issue.
 
-## Project boundaries
+Если на GitHub доступен раздел **Security → Advisories → Report a vulnerability**, используйте приватный отчёт. Наличие кнопки зависит от настроек репозитория; этот файл не означает, что функция включена.
 
-The project does not implement network telemetry, jailbreak-detection bypasses, credential collection or modifications to thermal/security services. It still inherits risks from the host app, jailbreak injector, toolchain and other loaded tweaks.
+Если приватной кнопки нет, создайте минимальный запрос на приватный способ связи, **не раскрывая чувствительных деталей**. Срок ответа и исправления не гарантируется.
 
-Only install assets from a release you trust. Check firmware, package variant and architecture. Know how to disable injection and uninstall before trying a new release. Do not provide GitHub or Apple credentials to anyone offering to install the tweak.
+## Границы проекта
 
-No formal supported-version security maintenance policy or independently audited release series is currently declared.
+В проекте не реализованы сетевая аналитика, сбор учётных данных, обход обнаружения джейлбрейка или изменение системной термозащиты. При этом остаются риски от приложения-хозяина, загрузчика, инструментов сборки и других твиков.
 
-## По-русски
+Уста��авливайте файлы только из доверенного релиза. Проверяйте прошивку, вариант и архитектуру. Заранее узнайте способ отключить инъекцию и удалить пакет. Не передавайте пароли GitHub/Apple и токены людям, предлагающим установку.
 
-Не публикуйте секреты и личные данные в Issues. При наличии используйте приватную кнопку сообщения об уязвимости на GitHub; иначе сначала запросите приватный канал, не раскрывая детали. Наличие этого файла не означает, что приватные отчёты включены или что код прошёл аудит.
+Формальная программа сопровождения безопасности по версиям и независимый аудит сейчас не заявляются.

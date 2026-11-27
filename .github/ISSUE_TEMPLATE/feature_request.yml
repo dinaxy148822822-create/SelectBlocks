@@ -1,25 +1,25 @@
-name: Feature request / Предложение
-description: Suggest a focused improvement.
-title: "[Feature]: "
+name: Предложить улучшение
+description: Предложите конкретное улучшение.
+title: "[Предложение]: "
 body:
   - type: textarea
     id: problem
     attributes:
-      label: What problem would this solve?
-      description: "English or Russian is welcome."
+      label: Какую проблему это решит?
+      description: "Можно писать по-русски или по-английски."
     validations:
       required: true
   - type: textarea
     id: proposal
     attributes:
-      label: Proposed behavior
-      description: "Explain the interaction and any compatibility or accessibility considerations."
+      label: Предлагаемое поведение
+      description: "Опишите взаимодействие и требования к совместимости и доступности."
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Alternatives and trade-offs
+      label: Альтернативы и компромиссы
   - type: markdown
     attributes:
-      value: "Please do not attach proprietary game assets, credentials or personal app data. A request does not guarantee implementation."
+      value: "Не прикладывайте закрытые ресурсы игр, секреты и личные данные. Предложение не гарантирует реализацию."

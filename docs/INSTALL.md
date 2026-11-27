@@ -1,41 +1,37 @@
-# Installation and recovery
+# Установка, обновление и удаление
 
-[Home](../README.md) · [Русская инструкция](../README.ru.md#установка) · [Compatibility](COMPATIBILITY.md)
+[Главная](../README.md) · [English](en/INSTALL.md) · [Совместимость](COMPATIBILITY.md)
 
-## Before you begin
+## Перед установкой
 
-- Use a jailbroken device with a supported 64-bit process architecture.
-- Check the release's own minimum iOS and package layout, not only the `main` branch documentation.
-- Know how your jailbreak starts **without tweak injection** and how to remove a package in that state. Keep important data backed up.
-- Do not install the rootful package into a rootless bootstrap or vice versa. Do not force an incompatible architecture or firmware dependency.
+- Устройство должно быть взломано и поддерживать нужную 64-битную архитектуру процесса.
+- Проверьте требования **конкретного релиза**: документация ветки `main` может описывать ещё не опубликованные сборки.
+- Узнайте способ запуска своего джейлбрейка **без инъекции твиков** и удаления пакета в таком состоянии. Сохраните важные данные.
+- Не устанавливайте rootful-пакет в rootless-окружение и наоборот. Не обходите проверку архитектуры или прошивки принудительной установкой.
 
-## Install a release asset
+## Установка
 
-1. Open [Releases](https://github.com/dinaxy148822822-create/SelectBlocks/releases).
-2. Read the notes and expand **Assets**.
-3. Download the matching `.deb`. GitHub's automatically generated **Source code** archives are not installable packages.
-4. Open the package with a compatible package manager or Filza and install it. Follow any restart prompt.
-5. Fully quit and reopen the target app so its process can load the updated library.
-6. Make sure tweak injection is allowed for the app. Select an entire [recognized name](../TriggerWords.json) in a supported text view and wait briefly.
+1. Откройте [Releases](https://github.com/dinaxy148822822-create/SelectBlocks/releases).
+2. Прочитайте описание версии и разверните **Assets**.
+3. Скачайте подходящий `.deb`. Архивы **Source code** содержат исходники и не устанавливаются как твик.
+4. Откройте пакет через совместимый менеджер пакетов или Filza. Установите и выполните предложенный перезапуск.
+5. Полностью закройте и снова откройте приложение, где будете играть.
+6. Убедитесь, что инъекция твиков разрешена. Выделите целиком [поддерживаемое название](../TriggerWords.json) в подходящем текстовом поле и немного подождите.
 
-The project currently distributes direct DEB downloads through GitHub Releases. **A Sileo/APT repository URL is not provided.** Adding this GitHub repository URL as a package source will not install the tweak.
+Здесь распространяются **прямые DEB-загрузки через GitHub Releases**. Адрес APT/Sileo-репозитория не предоставляется: добавление ссылки GitHub как источника не установит твик.
 
-## Update
+## Обновление
 
-Choose the same compatible package layout and a newer version. Game state uses the existing per-app preferences format; keep a copy of the last working DEB for rollback. A release's notes may override these general instructions.
+Выбирайте новую версию с тем же подходящим типом пакета. Сохранения находятся в настройках каждого приложения. Сохраните предыдущий рабочий `.deb` для отката. Указания конкретного релиза имеют приоритет над этой общей инструкцией.
 
-## Remove or recover
+## Удаление и восстановление
 
-If only one app crashes, disable tweak injection for that app using tools supported by your jailbreak, then remove SelectBlocks. If needed, start the jailbreak without tweak injection and uninstall it through the package manager. Exact steps vary by jailbreak and version.
+Если падает одно приложение, отключите инъекцию для него средствами своего джейлбрейка, затем удалите SelectBlocks. При необходимости запустите джейлбрейк без инъекции и удалите пакет через менеджер. Точные шаги зависят от инструмента и его версии.
 
-After removal, restart affected apps. Game state, the record and sound preference may remain in the app's preferences; generated sound files can remain in its cache. The package does not erase the host app's data.
+После удаления перезапустите затронутые приложения. Сохранения, рекорд и настройка звука могут остаться в настройках приложений, а синтезированные звуки — в кэше. Пакет не стирает данные самого приложения.
 
-## First launch checklist
+## Если игра не появляется
 
-- Is the release compatible with this firmware and architecture?
-- Is the package rootless or rootful as required?
-- Is injection enabled for the app?
-- Is the text in a standard editor, or the main document of a WKWebView?
-- Is the selected text an exact recognized name rather than a phrase?
+Проверьте версию пакета, тип rootless/rootful, архитектуру, разрешение инъекции и точное выделение слова. PDF, нестандартный редактор или iframe могут не поддерживаться.
 
-Still stuck? See the [FAQ](FAQ.md) or [open a bug report](https://github.com/dinaxy148822822-create/SelectBlocks/issues/new/choose). Remove personal information from logs and screenshots.
+Подробнее: [вопросы и устранение проблем](FAQ.md). В отчётах не публикуйте личные данные, токены и приватный текст.

@@ -1,18 +1,16 @@
-# Build SelectBlocks
+# Сборка SelectBlocks
 
-[Home](../README.md) · [Contributing](../CONTRIBUTING.md)
+[Главная](../README.md) · [English](en/BUILDING.md) · [Участие в разработке](../CONTRIBUTING.md)
 
-## Tooling
+## Инструменты
 
-Use a configured Theos environment with an iOS SDK, matching Apple toolchain and `ldid`. The modern arm64e CI targets use macOS. The official setup instructions are the source of truth:
+Нужны настроенный Theos, iOS SDK, подходящий инструментальный набор Apple и `ldid`. Современные arm64e-сборки в CI выполняются на macOS.
 
-- [macOS](https://theos.dev/docs/installation-macos)
-- [Linux / Windows with WSL](https://theos.dev/docs/installation-linux)
-- [arm64e ABI requirements](https://theos.dev/docs/arm64e-deployment)
+Официальные инструкции: [macOS](https://theos.dev/docs/installation-macos), [Linux/Windows через WSL](https://theos.dev/docs/installation-linux), [требования arm64e ABI](https://theos.dev/docs/arm64e-deployment).
 
-Windows users can use the repository's **Actions** workflow instead of installing a full local toolchain. A Linux/WSL toolchain must independently support the requested architecture; do not assume the modern arm64e requirements disappear outside macOS.
+На Windows можно использовать GitHub Actions вместо локальной установки. Наличие Linux/WSL не отменяет требований к инструментам для современного arm64e.
 
-## Local package
+## Локальная сборка
 
 ```bash
 git clone https://github.com/dinaxy148822822-create/SelectBlocks.git
@@ -20,34 +18,33 @@ cd SelectBlocks
 bash scripts/build.sh rootless
 ```
 
-Choose exactly one build variant:
+Выберите одну цель:
 
 ```bash
-bash scripts/build.sh rootless       # iOS 15+, arm64 + modern arm64e
-bash scripts/build.sh rootful        # iOS 14+, arm64 + modern arm64e
-bash scripts/build.sh rootful-legacy # iOS 12–13, arm64 only
+bash scripts/build.sh rootless       # iOS 15+, arm64 и современный arm64e
+bash scripts/build.sh rootful        # iOS 14+, arm64 и современный arm64e
+bash scripts/build.sh rootful-legacy # iOS 12–13, только arm64
 ```
 
-The script selects the correct `packaging/*.control` file, copies it to `control`, runs `clean` and invokes GNU Make. The modified `control` is an expected local build side effect; restore it before committing unless intentionally updating metadata. Build outputs are in `packages/`.
+Скрипт копирует соответствующий файл `packaging/*.control` в `control`, очищает результаты и запускает GNU Make. Изменение `control` после локальной сборки ожидаемо; перед коммитом восстановите его, если не планировали менять метаданные. Пакет находится в `packages/`.
 
-The source default is rootless. Avoid changing only the package architecture string or moving files inside an already-built DEB; the binary's link paths and slices must also match the variant.
+Не ограничивайтесь заменой строки архитектуры в старом DEB: пути линковки и срезы библиотеки тоже должны соответствовать варианту.
 
-## GitHub Actions
+## Через GitHub Actions
 
-1. Fork or use a repository you are authorized to write to.
-2. Open **Actions → Build DEB → Run workflow**. Availability and billing depend on your GitHub plan and settings.
-3. The test job runs before the build matrix.
-4. Three isolated builds produce rootless, rootful and legacy artifacts.
-5. Each DEB is checked for version, package architecture, library slices and installation prefix.
-6. Only after all required jobs succeed does the release job attach all three packages to the new version tag.
+1. Используйте собственный репозиторий или форк, в который у вас есть право записи.
+2. Откройте **Actions → Build DEB → Run workflow**. Доступность и стоимость зависят от лимитов GitHub.
+3. Сначала выполняются тесты, затем три изолированные сборки.
+4. Для каждого DEB проверяются версия, архитектура пакета, срезы библиотеки и путь установки.
+5. После успеха всех обязательных заданий публикуется релиз с тремя пакетами.
 
-A release is **not** created if a required job fails. Artifacts from an individual successful build may still be available. A repeated release using an existing tag can fail; bump the version consistently in all metadata before preparing a new release. Publishing in a fork changes that fork's releases, not this repository.
+При ошибке обязательного задания релиз не создаётся. Результаты отдельного успешного задания могут быть доступны в Artifacts. Публикация с уже существующим тегом может завершиться ошибкой: для нового выпуска согласованно обновляйте версию во всех метаданных.
 
-No personal token is required inside the repository workflow: it uses the job-scoped `GITHUB_TOKEN`. Never commit tokens or Apple account credentials.
+В workflow используется `GITHUB_TOKEN` текущего задания. **Личный токен и пароль Apple ID в исходники добавлять не нужно.** Публикация из форка изменяет релизы форка, не оригинального проекта.
 
-## Tests
+## Тесты
 
-Portable tests on Linux or macOS:
+На Linux или macOS:
 
 ```bash
 cc -std=c11 -O2 -Wall -Wextra tests/test_game.c -o /tmp/selectblocks-game
@@ -58,26 +55,26 @@ node tests/test_selection.js
 python3 tests/test_variants.py
 ```
 
-Native Foundation normalization test on macOS:
+Нативная проверка Foundation на macOS:
 
 ```bash
 clang -fobjc-arc -framework Foundation tests/test_triggers.m -o /tmp/selectblocks-triggers
 /tmp/selectblocks-triggers
 ```
 
-`tests/validate_package.py` additionally needs `dpkg-deb` and Apple's `lipo`. Source-level and package tests do not test touch behavior, audio output, animations or compatibility with other injected tweaks on a real device.
+Для `tests/validate_package.py` дополнительно нужны `dpkg-deb` и Apple `lipo`. Эти тесты не проверяют касания, реальный вывод звука, анимации и взаимодействие с другими твиками на устройстве.
 
-## Source map
+## Структура исходников
 
-| File / folder | Responsibility |
+| Файл / папка | Назначение |
 | --- | --- |
-| `Tweak.xm` | Native UI, selection hooks, animation and game integration |
-| `Game.h` | Portable board and scoring logic |
-| `TriggerWords.h` / `.json` | Trigger normalization, web template and documented names |
-| `SBAudio.h` / `SoundSynth.h` | Playback adapter and procedural WAV synthesis |
-| `packaging/` | Variant-specific Debian metadata |
-| `scripts/build.sh` | Clean variant-aware local build |
-| `tests/` | Portable, Foundation and package checks |
-| `.github/workflows/build.yml` | CI and release publication |
+| `Tweak.xm` | Интерфейс, перехваты выделения, анимация и интеграция |
+| `Game.h` | Переносимая логика поля и очков |
+| `TriggerWords.h` / `.json` | Нормализация названий, веб-шаблон и список слов |
+| `SBAudio.h` / `SoundSynth.h` | Воспроизведение и синтез WAV |
+| `packaging/` | Метаданные вариантов DEB |
+| `scripts/build.sh` | Сборка с очисткой и выбором варианта |
+| `tests/` | Проверки логики, Foundation и пакетов |
+| `.github/workflows/build.yml` | Автоматическая сборка и публикация |
 
-The workflow currently downloads its toolchain and SDK dependencies from their upstream repositories. Builds are not claimed to be bit-for-bit reproducible or dependency-pinned.
+Зависимости скачиваются из upstream-репозиториев. Побитовая воспроизводимость и фиксация всех версий зависимостей не заявляются.

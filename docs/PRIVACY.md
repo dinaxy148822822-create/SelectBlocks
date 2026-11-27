@@ -1,37 +1,37 @@
-# Privacy and local data
+# Приватность и локальные данные
 
-[Home](../README.md) · [Security](../SECURITY.md)
+[Главная](../README.md) · [English](en/PRIVACY.md) · [Безопасность](../SECURITY.md)
 
-This document describes the implementation in this repository, not the behavior of iOS, a host app, a jailbreak, a package manager or GitHub.
+Здесь описан код проекта, а не поведение iOS, приложения-хозяина, джейлбрейка, менеджера пакетов или GitHub.
 
-## Selection handling
+## Выделенный текст
 
-- Native code checks the currently selected text only when a supported selection setter runs. Length is capped at 96 UTF-16 code units.
-- Matching uses an explicit list of game names and Unicode normalization.
-- The WebKit script runs locally in the main document after a supported gesture. It returns a recognized name and its local geometry, or no match. It does not return arbitrary unrecognized selections.
-- For the entrance effect, a recognized word is rendered into an in-memory image. The surrounding app is not photographed; the original document is not edited.
-- No text-selection log or transmission of selected words is implemented.
+- В нативном редакторе проверяется выделение после поддерживаемого изменения диапазона. Лимит — 96 кодовых единиц UTF-16.
+- Для совпадения используются явный список названий и Unicode-нормализация.
+- Веб-скрипт выполняется локально после подходящего жеста. Он возвращает распознанное название и его геометрию либо отсутствие совпадения — не произвольное неизвестное выделение.
+- Для анимации слово отрисовывается в изображение в оперативной памяти. Окружение не фотографируется, исходный документ не меняется.
+- Журнал выделений и отправка слов на сервер в коде не реализованы.
 
-## Stored data
+## Что сохраняется
 
-Each host app has its own preferences entries:
+Настройки независимы для каждого приложения:
 
-| Key | Purpose |
+| Ключ | Назначение |
 | --- | --- |
-| `SelectBlocks.state.v1` | Saved game state |
-| `SelectBlocks.best.v1` | Highest local score |
-| `SelectBlocks.sound.enabled.v1` | Sound-effects preference |
+| `SelectBlocks.state.v1` | Сохранение партии |
+| `SelectBlocks.best.v1` | Локальный рекорд |
+| `SelectBlocks.sound.enabled.v1` | Настройка звуков |
 
-Procedurally generated sound files are cached under the host app's cache directory in `SelectBlocksAudio-v1`. They contain project-generated tones, not microphone audio or selected text. No microphone access is implemented.
+Синтезированные звуковые файлы находятся в папке `SelectBlocksAudio-v1` внутри кэша приложения. Это созданные проектом тоны, не запись микрофона и не выделенный текст. Доступ к микрофону не реализован.
 
-There is no shared online account or cross-app save synchronization. Closing or uninstalling the tweak does not promise removal of existing host-app preferences or caches. The host app and iOS may manage or remove those files independently.
+Общего онлайн-аккаунта и синхронизации партий между приложениями нет. Удаление твика не обещает очистку старых настроек и кэша приложения: ими также управляют само приложение и iOS.
 
-## Networking and sound
+## Сеть и звук
 
-The tweak does not implement an analytics service, background music stream or network request. Build tooling downloads dependencies, GitHub serves releases, and badges in the README load from GitHub/Shields; these are separate from the installed tweak.
+Твик не реализует аналитику, фоновые музыкальные потоки и сетевые запросы. Отдельно от него инструменты сборки скачивают зависимости, GitHub раздаёт релизы, а значки README загружаются с GitHub/Shields.
 
-Effects use System Sound Services without reconfiguring the host app's AVAudioSession. Actual playback depends on device settings and platform behavior. The project does not change system volume to force playback.
+Эффекты воспроизводятся через System Sound Services без перенастройки AVAudioSession приложения. Реальное воспроизведение зависит от системных настроек. Проект не повышает системную громкость принудительно.
 
-## Bug reports
+## Отчёты об ошибках
 
-Before posting a log or screenshot, remove access tokens, emails, private page text, device identifiers and unrelated app data. Reproduce selection issues using a disposable sample word whenever possible.
+Перед публикацией удалите токены, адреса почты, приватный текст, идентификаторы устройства и лишние данные приложения. Проверяйте выделение на безобидном примере.

@@ -1,20 +1,20 @@
-## What changed?
+## Что изменено?
 
-Explain the behavior and motivation. English or Russian is welcome.
+Опишите поведение и причину изменения. Можно на русском или английском.
 
-## Verification
+## Проверка
 
-- [ ] Relevant portable tests pass.
-- [ ] Package metadata and deployment targets remain consistent, if affected.
-- [ ] User-facing documentation is updated, if behavior changed.
-- [ ] No credentials, private logs or unauthorized game assets are included.
+- [ ] Нужные переносимые тесты проходят.
+- [ ] Метаданные и минимальные версии iOS согласованы, если затронуты.
+- [ ] Документация обновлена, если изменилось поведение.
+- [ ] Нет паролей, приватных логов и ресурсов без разрешения на использование.
 
-Device checks performed (device / iOS / loader / app), or explicitly state **not tested on a device**:
+Проверка на устройстве: модель / iOS / загрузчик / приложение. Если её не было, явно напишите **«На устройстве не проверено»**.
 
-## Compatibility and risks
+## Совместимость и риски
 
-Describe affected variants, fallback behavior and any known limitations.
+Укажите затронутые варианты пакета, запасное поведение и ограничения.
 
-## Related issue
+## Связанное обращение
 
-Link an existing issue when applicable.
+Ссылка на Issue, если есть.

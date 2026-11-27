@@ -1,13 +1,15 @@
-# Community guidelines
+# Правила сообщества
 
-Keep participation useful, respectful and focused on the project.
+[Главная](README.md) · [English](docs/en/CODE_OF_CONDUCT.md)
 
-- Be considerate of different languages, experience levels and accessibility needs.
-- Critique code and behavior, not people. No harassment, threats, slurs or personal attacks.
-- Do not post credentials, private messages, identifying information or unredacted app data.
-- Do not spam, impersonate maintainers or make unsupported claims of official affiliation.
-- Prefer reproducible evidence when discussing compatibility or a suspected bug.
+Общайтесь уважительно и по теме проекта.
 
-Maintainers may edit or remove off-topic or harmful content and restrict participation using GitHub's moderation tools. A particular response time or moderation outcome is not promised. For platform-level abuse, use GitHub's own reporting controls. For sensitive code issues, see [SECURITY.md](SECURITY.md).
+- Учитывайте различия языков, опыта и потребностей доступности.
+- Обсуждайте код и поведение, а не личность человека. Недопустимы травля, угрозы, оскорбления и дискриминация.
+- Не публикуйте пароли, токены, личные сообщения, идентифицирующие данные и необезличенные материалы приложений.
+- Не спамьте, не выдавайте себя за сопровождающих и не заявляйте о несуществующем официальном партнёрстве.
+- Подтверждайте сообщения о совместимости и ошибках воспроизводимыми примерами.
 
-Обсуждения на русском и английском приветствуются. Уважайте других участников и не публикуйте чужие или собственные секретные данные.
+Сопровождающие могут редактировать или удалять вредный и не относящийся к делу контент, а также ограничивать участие средствами GitHub. Определённый срок реакции или исход модерации не обещается. Для нарушений правил платформы используйте инструменты GitHub; для чувствительных проблем кода — [инструкцию безопасности](SECURITY.md).
+
+Русский и английский языки приветствуются. Не публикуйте ни чужие, ни собственные секретные данные.

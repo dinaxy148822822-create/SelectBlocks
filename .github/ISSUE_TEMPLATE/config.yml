@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Installation and troubleshooting
+  - name: Установка и частые вопросы
     url: https://github.com/dinaxy148822822-create/SelectBlocks/blob/main/docs/FAQ.md
-    about: Read common answers before reporting a problem.
-  - name: Sensitive security reports
+    about: Проверьте готовые ответы перед созданием отчёта.
+  - name: Чувствительные проблемы безопасности
     url: https://github.com/dinaxy148822822-create/SelectBlocks/blob/main/SECURITY.md
-    about: Do not disclose secrets or sensitive details in a public issue.
+    about: Не публикуйте секреты и личные данные в открытом Issue.

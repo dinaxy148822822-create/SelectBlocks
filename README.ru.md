@@ -8,7 +8,7 @@
 [![Релиз](https://img.shields.io/github/v/release/dinaxy148822822-create/SelectBlocks?color=2783DE)](https://github.com/dinaxy148822822-create/SelectBlocks/releases/latest)
 [![MIT](https://img.shields.io/badge/license-MIT-2783DE.svg)](LICENSE)
 
-**[Скачать](https://github.com/dinaxy148822822-create/SelectBlocks/releases)** · **[Совместимость](docs/COMPATIBILITY.md)** · **[Сборка](docs/BUILDING.md)** · **[English](README.md)**
+**[Скачать](https://github.com/dinaxy148822822-create/SelectBlocks/releases)** · **[Совместимость](docs/COMPATIBILITY.md)** · **[Сборка](docs/BUILDING.md)** · **[English](README.en.md)**
 
 SelectBlocks — нативный jailbreak-твик на Objective-C/Logos и C. Выдели `tetris`, `тетрис`, `テトリス` или другое название из [списка](TriggerWords.json) в поддерживаемом текстовом поле. Откроется игра; кнопка выхода вернёт тебя в приложение.
 

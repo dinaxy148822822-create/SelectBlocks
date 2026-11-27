@@ -1,33 +1,35 @@
-# Changelog
+# История изменений
 
-This summary separates source changes from published assets. Check [Releases](https://github.com/dinaxy148822822-create/SelectBlocks/releases) for actual binary availability. See [the Russian history](CHANGELOG-RU.md) for more detail.
+[Главная](README.md) · [English](docs/en/CHANGELOG.md) · [Подробная история](CHANGELOG-RU.md)
 
-## 1.1.0 — compatibility expansion in source
+Ниже отделены изменения исходников от доступности готовых файлов. Фактически опубликованные DEB смотрите в [Releases](https://github.com/dinaxy148822822-create/SelectBlocks/releases).
 
-- Separate rootless iOS 15+, rootful iOS 14+ and arm64-only legacy iOS 12–13 build variants.
-- Classic target/action callbacks and guarded iOS 13 window/color features.
-- Legacy window path for apps without scenes.
-- Variant-specific metadata and CI validation of binary slices and installation paths.
-- No claim of full old-arm64e, 32-bit or universal jailbreak support.
+## 1.1.0 — расширение совместимости в исходниках
 
-## 1.0.0 — regular release
+- Отдельные rootless-сборки для iOS 15+, rootful для iOS 14+ и legacy arm64 для iOS 12–13.
+- Классическая обработка нажатий и проверки доступности функций iOS 13.
+- Оконный режим для старых систем и приложений без UIScene.
+- Раздельные метаданные и CI-проверки архитектур и путей установки.
+- Полная поддержка старого arm64e, 32-битных устройств и всех джейлбрейков не заявляется.
 
-- Eight original synthesized chiptune cues and a persistent per-app SND/OFF switch.
-- Regular release labeling without Experimental in the package name.
-- WAV format, amplitude and timing tests. No background music.
+## 1.0.0 — обычный релиз
+
+- Восемь синтезированных ретро-звуков и сохраняемый переключатель SND/OFF.
+- Удалена метка Experimental из имени пакета.
+- Тесты WAV, амплитуды и длительности. Фоновая музыка не добавлена.
 
 ## 0.3.0
 
-- Top utility controls; bottom movement, rotation and hold.
-- Retro HUD and locally drawn controls.
-- Recognized-word flight animation with reduced-motion/geometry fallbacks.
-- Explicit multilingual trigger aliases and matching tests.
+- Служебные кнопки перенесены наверх, движение, повороты и HOLD оставлены снизу.
+- Ретро-счётчики и программно нарисованные кнопки.
+- Перелёт распознанного слова с запасным затуханием.
+- Многоязычные варианты запуска и тесты нормализации.
 
 ## 0.2.0
 
-- Initial redesigned native-style UI, bottom controls and procedural beveled blocks.
-- Entry and exit transitions with reduced-motion handling.
+- Переработанный интерфейс, нижнее управление и объёмные блоки.
+- Анимация появления и закрытия с учётом «Уменьшения движения».
 
 ## 0.1.0
 
-- Initial text-selection prototype, portable falling-block engine and rootless package workflow.
+- Первый прототип запуска по выделению, игровая логика и автоматическая rootless-сборка.

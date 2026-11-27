@@ -2,85 +2,83 @@
 
 # SelectBlocks
 
-**Select a word. Open a retro falling-block game without leaving your app.**
+**Выдели слово — открой ретро-игру прямо в текущем приложении.**
 
-[![Build](https://github.com/dinaxy148822822-create/SelectBlocks/actions/workflows/build.yml/badge.svg)](https://github.com/dinaxy148822822-create/SelectBlocks/actions/workflows/build.yml)
-[![Release](https://img.shields.io/github/v/release/dinaxy148822822-create/SelectBlocks?color=2783DE)](https://github.com/dinaxy148822822-create/SelectBlocks/releases/latest)
-[![License: MIT](https://img.shields.io/badge/license-MIT-2783DE.svg)](LICENSE)
+[![Сборка](https://github.com/dinaxy148822822-create/SelectBlocks/actions/workflows/build.yml/badge.svg)](https://github.com/dinaxy148822822-create/SelectBlocks/actions/workflows/build.yml)
+[![Релиз](https://img.shields.io/github/v/release/dinaxy148822822-create/SelectBlocks?color=2783DE)](https://github.com/dinaxy148822822-create/SelectBlocks/releases/latest)
+[![MIT](https://img.shields.io/badge/license-MIT-2783DE.svg)](LICENSE)
 
-**[Download](https://github.com/dinaxy148822822-create/SelectBlocks/releases)** · **[Install](docs/INSTALL.md)** · **[Compatibility](docs/COMPATIBILITY.md)** · **[Build](docs/BUILDING.md)** · **[Русский](README.ru.md)**
+**[Скачать](https://github.com/dinaxy148822822-create/SelectBlocks/releases)** · **[Совместимость](docs/COMPATIBILITY.md)** · **[Сборка](docs/BUILDING.md)** · **[English](README.en.md)**
 
-SelectBlocks is a native jailbreak tweak written in Objective-C/Logos and C. Select `tetris`, `тетрис`, `テトリス`, or another [recognized name](TriggerWords.json) in a supported text view, and a small game opens in the current app. Close it to return to what you were doing.
+SelectBlocks — нативный jailbreak-твик на Objective-C/Logos и C. Выдели `tetris`, `тетрис`, `テトリス` или другое название из [списка](TriggerWords.json) в поддерживаемом текстовом поле. Откроется игра; кнопка выхода вернёт тебя в приложение.
 
-> **A jailbreak and working tweak injection are required.** This is not an App Store app or a jailbreak tool. Text-selection support varies by app. Broader build targets are not a claim of testing on every device.
+> Нужны джейлбрейк и разрешённая инъекция твиков. Это не приложение из App Store и не инструмент для установки джейлбрейка. Работа выделения зависит от редактора. Заявленная цель сборки не означает проверку на каждом устройстве.
 
-## A small game, thoughtfully integrated
+## Возможности
 
-| Play | Feel | Stay in control |
+- Поле **10 × 20**, семь фигур и случайный 7-bag.
+- Запас **HOLD**, три следующие фигуры и призрак места падения.
+- Повороты в обе стороны, мягкий спуск и мгновенный сброс.
+- Очки, линии, уровни, рекорд и сохранение отдельно для каждого приложения.
+- Ретро-счётчики и заново нарисованные объёмные блоки.
+- Перелёт выделенного слова к заголовку, если редактор отдаёт координаты. При «Уменьшении движения» — затухание.
+- Восемь коротких синтезированных звуков и переключатель **SND / OFF**.
+- Пауза при уходе приложения в фон.
+
+Повороты упрощённые, **это не SRS**. T-spin, combo, back-to-back, онлайн и фоновая музыка не реализованы.
+
+## Установка
+
+1. Открой **[Releases](https://github.com/dinaxy148822822-create/SelectBlocks/releases)** и прочитай описание конкретной версии.
+2. Скачай подходящий **`.deb` из Assets**, не архив исходников.
+3. Установи пакет через совместимый менеджер, например Sileo/Zebra, или открой его в Filza. Выполни предложенный перезапуск; полностью закрой и открой приложение, где будешь играть.
+4. Разреши инъекцию твиков для выбранного приложения и выдели поддерживаемое название.
+
+**До установки узнай, как запустить свой джейлбрейк без инъекции твиков.** При сбое отключи инъекцию для приложения или удали SelectBlocks. Не меняй способ загрузки джейлбрейка по случайной инструкции: шаги зависят от него.
+
+## Какой файл выбрать
+
+Это **цели сборки ветки `main`**, добавленные для 1.1.0. Не считай их автоматически доступными в старых релизах: ориентируйся на файлы и описание конкретного выпуска.
+
+| Окончание имени файла | Для чего | Ограничения |
 | --- | --- | --- |
-| 10 × 20 board and seven pieces | Retro panels and procedural beveled blocks | Pause, restart and close at the top |
-| Seven-bag randomizer and three-piece preview | A selected-word entrance animation, when geometry is available | Movement, rotation and hold at the bottom |
-| Hold, ghost piece, soft drop and hard drop | Eight newly synthesized chiptune effects | Persistent **SND / OFF** toggle |
-| Score, lines, levels and a per-app record | Reduced-motion fallback | Per-app saves and automatic pause when leaving the app |
+| `_rootless.deb` | Стандартный rootless, iOS 15+, arm64/arm64e | Нужны совместимые bootstrap и загрузчик |
+| `_rootful.deb` | Rootful, iOS 14+, arm64/arm64e | Не устанавливать вместо rootless |
+| `_rootful-legacy.deb` | Rootful, iOS 12–13, arm64 | Не для системных arm64e-приложений на A12+ |
 
-The rotation system uses simple wall kicks, **not SRS**. Modern guideline features such as T-spins, combos, back-to-back bonuses and online play are not implemented. There is no background music.
+**iOS 18 входит в диапазон современных целей сборки, но не подтверждена тестированием на устройстве.** 32-битные iPhone, iOS ниже 12, старый arm64e ABI iOS 12/13 и нестандартные bootstrap не входят в заявленное покрытие. Подробнее: [совместимость](docs/COMPATIBILITY.md).
 
-## Get started
+## Управление
 
-1. Open **[Releases](https://github.com/dinaxy148822822-create/SelectBlocks/releases)** and read the notes for the exact release you intend to install.
-2. Download the appropriate **`.deb` asset**, not GitHub's source-code ZIP.
-3. Install with a compatible package manager such as Sileo or Zebra, or open the package in Filza. Restart affected apps and follow any restart prompt.
-4. In an app with tweak injection enabled, select a recognized name and wait briefly.
-
-**Know your jailbreak's method for starting without tweak injection before installing.** If an app crashes, disable injection for it or remove SelectBlocks. See the [installation and recovery guide](docs/INSTALL.md).
-
-## Pick the right package
-
-These are the **build targets on `main`**, introduced for the 1.1.0 source tree. An attached release asset is the authority for what has actually shipped; older releases can have narrower requirements.
-
-| File suffix | Layout | Build target | Important limitation |
-| --- | --- | --- | --- |
-| `_rootless.deb` | Standard rootless | iOS 15+, arm64 + modern arm64e | Requires a compatible bootstrap and injector |
-| `_rootful.deb` | Rootful | iOS 14+, arm64 + modern arm64e | Not interchangeable with rootless |
-| `_rootful-legacy.deb` | Rootful | iOS 12–13, arm64 | No legacy arm64e system-process support on A12+ |
-
-**iOS 18 is within the modern build ranges, not independently certified.** 32-bit devices, iOS below 12, old arm64e ABI on iOS 12–13 and nonstandard bootstraps are outside the declared coverage. Read [compatibility details](docs/COMPATIBILITY.md) before installing.
-
-## Controls
-
-| Location | Button | Action |
+| Где | Кнопка | Действие |
 | --- | --- | --- |
-| Top | **DROP** | Instantly drop and lock the current piece |
-| Top | **PAUSE / PLAY** | Pause or continue |
-| Top | **RESET** | Start a new game after confirmation |
-| Top | **EXIT** | Save and close the game |
-| Header | **SND / OFF** | Toggle sound effects for the current app |
-| Bottom | **LEFT / RIGHT** | Move; hold for repeat |
-| Bottom | **B / A** | Rotate counterclockwise / clockwise |
-| Bottom | **DOWN** | Soft drop; hold for repeat |
-| Bottom | **HOLD** | Store or swap a piece once per piece |
+| Сверху | **DROP** | Мгновенно сбросить и зафиксировать фигуру |
+| Сверху | **PAUSE / PLAY** | Пауза / продолжить |
+| Сверху | **RESET** | Новая игра с подтверждением |
+| Сверху | **EXIT** | Сохранить и закрыть |
+| В заголовке | **SND / OFF** | Включить / выключить эффекты |
+| Снизу | **LEFT / RIGHT** | Движение с повтором при удержании |
+| Снизу | **B / A** | Поворот против / по часовой стрелке |
+| Снизу | **DOWN** | Мягкий спуск с удержанием |
+| Снизу | **HOLD** | Запас / обмен один раз на фигуру |
 
-Score: **100 / 300 / 500 / 800 × current level** for one through four lines. Soft drop adds one point per cell; hard drop adds two. The level increases every ten lines.
+За 1/2/3/4 линии начисляется **100/300/500/800 × текущий уровень**. Мягкий спуск даёт +1 за клетку, мгновенный — +2. Каждые 10 линий повышают уровень.
 
-## Trigger names
+## Языки запуска
 
-Examples: `tetris` · `тетрис` · `тетріс` · `テトリス` · `테트리스` · `تتريس` · `טטריס` · `俄罗斯方块`.
+Например: `tetris`, `тетрис`, `тетріс`, `テトリス`, `테트리스`, `تتريس`, `טטריס`, `俄罗斯方块`.
 
-The [full list](TriggerWords.json) contains 18 spellings, not 18 independently tested language environments. Matching normalizes case, compatible full-width forms, selected diacritics and Arabic marks. Only an entire recognized selection triggers the game; `let's play tetris` does not. This is an explicit alias list, not an automatic translator.
+Полный [список из 18 написаний](TriggerWords.json) — это не автоматический перевод и не 18 протестированных языковых окружений. Учитываются регистр, совместимые полноширинные символы и отдельные диакритические знаки. Выделять нужно именно название, без лишних слов.
 
-## Privacy and limitations
+## Честно об ограничениях
 
-- No app-level networking, analytics or text-selection log is implemented.
-- Only a recognized word is used to create the entrance animation; surrounding app content is not captured.
-- Game state, the record and the sound preference live in each host app's preferences. Synthesized sounds are cached locally.
-- Web selection is experimental in behavior: main-document `WKWebView` support after a long press. Iframes, protected fields, PDFs and custom editors may not work.
-- No bypass of jailbreak detection or disabled tweak injection is included.
+- Нельзя гарантировать запуск во всех приложениях: PDF, iframe, защищённые поля и нестандартные редакторы могут не поддерживаться.
+- При отключённой инъекции твиков игра не появится. Обход обнаружения джейлбрейка не добавлен.
+- Сохранения и звук независимы для каждого приложения.
+- Сетевой обмен, аналитика и журнал выделений в коде не реализованы. Копия распознанного слова для анимации создаётся локально; окружение не фотографируется. Звуки кэшируются на устройстве.
+- Успешная сборка и обычный статус релиза не гарантируют отсутствие ошибок на каждом устройстве.
 
-Full details: **[Privacy](docs/PRIVACY.md)** · **[FAQ and troubleshooting](docs/FAQ.md)** · **[Security](SECURITY.md)**.
-
-## Build and contribute
-
-Use a configured [Theos](https://theos.dev/) environment:
+## Разработка и помощь
 
 ```bash
 git clone https://github.com/dinaxy148822822-create/SelectBlocks.git
@@ -88,12 +86,10 @@ cd SelectBlocks
 bash scripts/build.sh rootless
 ```
 
-Use `rootful` or `rootful-legacy` for the other variants. GitHub Actions builds and validates the packages separately. Passing tests or compilation does **not** certify runtime behavior.
+Сначала настрой [Theos](https://theos.dev/). Вместо `rootless` доступны `rootful` и `rootful-legacy`.
 
-**[Build guide](docs/BUILDING.md)** · **[Contributing](CONTRIBUTING.md)** · **[Changelog](CHANGELOG.md)** · **[Report a bug](https://github.com/dinaxy148822822-create/SelectBlocks/issues/new/choose)**
+**[Сборка](docs/BUILDING.md)** · **[Вопросы и устранение проблем](docs/FAQ.md)** · **[Участие](CONTRIBUTING.md)** · **[История изменений](CHANGELOG.md)** · **[Сообщить об ошибке](https://github.com/dinaxy148822822-create/SelectBlocks/issues/new/choose)**
 
-## License and acknowledgements
+[Приватность](docs/PRIVACY.md) · [Безопасность](SECURITY.md) · [MIT License](LICENSE)
 
-Released under the [MIT License](LICENSE). Built using the Theos toolchain and Apple's platform frameworks; those projects retain their respective rights and licenses.
-
-SelectBlocks is an independent falling-block implementation. It is not affiliated with or endorsed by the owners of Tetris. Commercial game artwork, recordings and music are not bundled; the visuals and effects are generated for this project. The selection names identify the trigger behavior, not an official affiliation.
+Независимая реализация игры с падающими блоками. Проект не связан с правообладателями Tetris и не является официальным продуктом. Официальные изображения, записи и музыка не включены.
