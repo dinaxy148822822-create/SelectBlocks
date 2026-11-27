@@ -25,6 +25,10 @@ jobs:
         run: |
           cc -std=c11 -O2 -Wall -Wextra tests/test_game.c -o "$RUNNER_TEMP/selectblocks-test"
           "$RUNNER_TEMP/selectblocks-test"
+      - name: Test sound synthesis
+        run: |
+          cc -std=c11 -O2 -Wall -Wextra tests/test_sound.c -lm -o "$RUNNER_TEMP/selectblocks-sound-test"
+          "$RUNNER_TEMP/selectblocks-sound-test"
       - name: Test multilingual triggers
         run: |
           node tests/test_selection.js
@@ -51,15 +55,14 @@ jobs:
           name: SelectBlocks-rootless-DEB
           path: packages/*.deb
           if-no-files-found: error
-      - name: Publish experimental DEB to Releases
+      - name: Publish DEB to Releases
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSION="$(awk '/^Version:/{print $2; exit}' control)"
-          TAG="v${VERSION}-build-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+          TAG="v${VERSION}"
           gh release create "$TAG" packages/*.deb \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --prerelease \
-            --title "SelectBlocks ${VERSION} — experimental build ${GITHUB_RUN_NUMBER}" \
-            --notes "Экспериментальный rootless-твик для iOS 16. Версия 0.3: служебные кнопки наверху, движение и повороты снизу, ретро-счётчики и кнопки, перелёт распознанного слова к заголовку, многоязычные названия. При неизвестных координатах или Reduce Motion используется затухание. Скачивайте файл .deb из Assets. Сборка не означает проверку работы на iPhone: нативный интерфейс и совместимость с устройством не протестированы. Поддержка выделения зависит от приложения; возможны сбои. Перед установкой убедитесь, что умеете запускать jailbreak без инъекции твиков для удаления пакета. Исходники и ограничения: README-RU.txt в репозитории."
+            --title "SelectBlocks ${VERSION}" \
+            --notes "SelectBlocks 1.0.0 — обычный релиз без пометки Experimental. Добавлены заново синтезированные короткие 8-битные эффекты движения, поворота, падения, фиксации, линий, четырёх линий, HOLD и проигрыша. SND/OFF вверху отключает звук; настройка сохраняется отдельно для каждого приложения. Фоновая музыка не включена; аудиосессия приложения не перенастраивается. Скачивайте .deb из Assets. Предыдущую версию пользователь проверил на своём iPhone; новые звуковые эффекты и работа во всех приложениях не подтверждены тестированием на устройстве. Называние обычным релизом не гарантирует отсутствие ошибок. Совместимость и удаление описаны в README-RU.txt."

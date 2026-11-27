@@ -1,8 +1,8 @@
 Package: local.selectblocks
-Name: SelectBlocks (Experimental)
-Version: 0.3.0
+Name: SelectBlocks
+Version: 1.0.0
 Architecture: iphoneos-arm64
-Description: Retro HUD and controls, selected-word entrance animation and multilingual triggers. Experimental rootless tweak.
+Description: Retro falling-block game with chiptune effects, multilingual selection triggers and animated UI. Rootless iOS 16.
 Maintainer: Local Build
 Author: Local Build
 Section: Tweaks

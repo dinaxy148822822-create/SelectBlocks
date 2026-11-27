@@ -3,6 +3,7 @@
 #import <objc/runtime.h>
 #import "Game.h"
 #import "TriggerWords.h"
+#import "SBAudio.h"
 #include <stdlib.h>
 #include <math.h>
 
@@ -150,6 +151,8 @@ static void RetroPanel(CGRect rect) {
  Game _game; BOOL _paused; double _lastTick,_fall,_lock,_pressedAt; int _pressed; int _best; BOOL _appeared; BOOL _closing; BOOL _entryRunning;
 }
 @property(nonatomic,strong) NSTimer *timer;
+@property(nonatomic,strong) SBAudio *audio;
+@property(nonatomic,strong) SBControl *soundButton;
 @property(nonatomic,strong) UIStackView *surface;
 @property(nonatomic,strong) UIButton *pauseButton;
 @property(nonatomic,strong) SBBoard *board;
@@ -165,6 +168,7 @@ static void RetroPanel(CGRect rect) {
 @implementation SBGameController
 - (void)viewDidLoad {
  [super viewDidLoad]; __weak typeof(self) weakSelf=self; self.view.backgroundColor=[UIColor colorWithWhite:.075 alpha:1];
+ self.audio=[SBAudio new];
  _pressed=-1;_lastTick=NSDate.timeIntervalSinceReferenceDate;
  NSUserDefaults *d=NSUserDefaults.standardUserDefaults;NSData *save=[d dataForKey:@"SelectBlocks.state.v1"];
  BOOL valid=NO;
@@ -183,7 +187,10 @@ static void RetroPanel(CGRect rect) {
  UILabel *title=[[UILabel alloc]init];self.logo=title;UIFont *font=[UIFont systemFontOfSize:34 weight:UIFontWeightBlack];UIFontDescriptor *fd=[font.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];if(fd)font=[UIFont fontWithDescriptor:fd size:34];
  NSString *heading=self.entryWord.length?[self.entryWord uppercaseString]:@"TETRIS";
  title.attributedText=[[NSAttributedString alloc]initWithString:heading attributes:@{NSFontAttributeName:font,NSKernAttributeName:@(-1.0),NSForegroundColorAttributeName:[UIColor colorWithRed:1 green:.66 blue:.20 alpha:1],NSStrokeColorAttributeName:[UIColor colorWithWhite:.98 alpha:1],NSStrokeWidthAttributeName:@(-2)}];title.accessibilityLabel=heading;title.textAlignment=NSTextAlignmentCenter;title.adjustsFontSizeToFitWidth=YES;title.minimumScaleFactor=.5;
- [title.heightAnchor constraintEqualToConstant:44].active=YES;[root addArrangedSubview:title];
+ UIView *leftBalance=[UIView new];[leftBalance.widthAnchor constraintEqualToConstant:48].active=YES;
+ self.soundButton=(SBControl *)[self button:@"Звук" caption:self.audio.enabled?@"SND":@"OFF" symbol:@"" utility:YES prominent:self.audio.enabled action:^{[weakSelf toggleSound];}];[self.soundButton.widthAnchor constraintEqualToConstant:48].active=YES;
+ self.soundButton.accessibilityLabel=self.audio.enabled?@"Выключить звуки":@"Включить звуки";
+ UIStackView *headingRow=[[UIStackView alloc]initWithArrangedSubviews:@[leftBalance,title,self.soundButton]];headingRow.spacing=8;[headingRow.heightAnchor constraintEqualToConstant:44].active=YES;[root addArrangedSubview:headingRow];
  self.pauseButton=[self button:@"Пауза" caption:@"PAUSE" symbol:@"" utility:YES prominent:NO action:^{[weakSelf pauseAction];}];
  NSArray *utilities=@[[self button:@"Мгновенный сброс фигуры" caption:@"DROP" symbol:@"" utility:YES prominent:YES action:^{[weakSelf dropAction];}],self.pauseButton,[self button:@"Новая игра" caption:@"RESET" symbol:@"" utility:YES prominent:NO action:^{[weakSelf restartAction];}],[self button:@"Выйти" caption:@"EXIT" symbol:@"" utility:YES prominent:NO action:^{[weakSelf closeGame];}]];
  UIStackView *toolbar=[[UIStackView alloc]initWithArrangedSubviews:utilities];toolbar.spacing=8;toolbar.distribution=UIStackViewDistributionFillEqually;[toolbar.heightAnchor constraintEqualToConstant:44].active=YES;[root addArrangedSubview:toolbar];
@@ -227,12 +234,21 @@ static void RetroPanel(CGRect rect) {
  [b addTarget:self action:@selector(press:) forControlEvents:UIControlEventTouchDown];
  [b addTarget:self action:@selector(releasePress:) forControlEvents:UIControlEventTouchUpInside|UIControlEventTouchUpOutside|UIControlEventTouchCancel|UIControlEventTouchDragExit];return b;
 }
+- (void)toggleSound {
+ self.audio.enabled=!self.audio.enabled;[NSUserDefaults.standardUserDefaults setBool:self.audio.enabled forKey:@"SelectBlocks.sound.enabled.v1"];
+ self.soundButton.caption=self.audio.enabled?@"SND":@"OFF";self.soundButton.prominent=self.audio.enabled;self.soundButton.accessibilityLabel=self.audio.enabled?@"Выключить звуки":@"Включить звуки";[self.soundButton setNeedsDisplay];
+ if(self.audio.enabled)[self.audio play:SBFX_ROTATE];
+}
+- (void)playLockResult:(int)previousLines drop:(BOOL)drop {
+ int cleared=_game.lines-previousLines;
+ [self.audio play:_game.over?SBFX_OVER:(cleared>=4?SBFX_FOUR:(cleared>0?SBFX_CLEAR:(drop?SBFX_DROP:SBFX_LOCK)))];
+}
 - (void)press:(UIButton *)b{if(_paused||_game.over||_entryRunning)return;_pressed=(int)b.tag;_pressedAt=NSDate.timeIntervalSinceReferenceDate;[self step:_pressed];}
 - (void)releasePress:(id)sender{_pressed=-1;}
-- (void)step:(int)action {if(_paused||_game.over||_entryRunning)return;if(action==2){if(movePiece(&_game,0,1))_game.score++;}else movePiece(&_game,action==0?-1:1,0);[self refresh];}
-- (void)rotate:(int)direction {if(_paused||_game.over||_entryRunning)return;rotatePiece(&_game,direction);[self refresh];}
-- (void)holdAction {if(_paused||_game.over||_entryRunning)return;holdPiece(&_game);_fall=_lock=0;[self refresh];}
-- (void)dropAction {if(_paused||_game.over||_entryRunning)return;hardDrop(&_game);_fall=_lock=0;[self persist];[self refresh];}
+- (void)step:(int)action {if(_paused||_game.over||_entryRunning)return;BOOL moved=NO;if(action==2){moved=movePiece(&_game,0,1);if(moved)_game.score++;}else moved=movePiece(&_game,action==0?-1:1,0);if(moved)[self.audio play:SBFX_MOVE];[self refresh];}
+- (void)rotate:(int)direction {if(_paused||_game.over||_entryRunning)return;if(rotatePiece(&_game,direction))[self.audio play:SBFX_ROTATE];[self refresh];}
+- (void)holdAction {if(_paused||_game.over||_entryRunning)return;if(!_game.holdUsed){holdPiece(&_game);[self.audio play:_game.over?SBFX_OVER:SBFX_HOLD];}_fall=_lock=0;[self refresh];}
+- (void)dropAction {if(_paused||_game.over||_entryRunning)return;int before=_game.lines;hardDrop(&_game);[self playLockResult:before drop:YES];_fall=_lock=0;[self persist];[self refresh];}
 - (void)pauseAction {if(_game.over)return;_paused=!_paused;_pressed=-1;[self persist];[self refresh];}
 - (void)restartAction {BOOL wasPaused=_paused;_paused=YES;_pressed=-1;[self refresh];
  UIAlertController *a=[UIAlertController alertControllerWithTitle:@"Новая игра?" message:@"Текущая партия будет сброшена." preferredStyle:UIAlertControllerStyleAlert];__weak typeof(self) w=self;
@@ -241,7 +257,7 @@ static void RetroPanel(CGRect rect) {
 - (void)tick {double now=NSDate.timeIntervalSinceReferenceDate,dt=fmin(.1,fmax(0,now-_lastTick));_lastTick=now;if(_paused||_game.over||_entryRunning)return;
  if(_pressed>=0&&now-_pressedAt>.22){[self step:_pressed];}
  _fall+=dt;if(_fall>=gravity(&_game)){_fall=0;movePiece(&_game,0,1);}
- if(!fits(&_game,_game.x,_game.y+1,_game.rot)){_lock+=dt;if(_lock>=.45){lockPiece(&_game);_lock=0;_fall=0;[self persist];}}else _lock=0;
+ if(!fits(&_game,_game.x,_game.y+1,_game.rot)){_lock+=dt;if(_lock>=.45){int before=_game.lines;lockPiece(&_game);[self playLockResult:before drop:NO];_lock=0;_fall=0;[self persist];}}else _lock=0;
  [self refresh];
 }
 - (void)refresh {
