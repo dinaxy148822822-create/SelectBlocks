@@ -58,21 +58,31 @@ with tempfile.TemporaryDirectory(prefix='selectblocks-apt-') as temp:
     def verify(item):
         url, expected = item
         error = ''
-        for attempt in range(3):
+        for attempt in range(12):
             try:
                 request = urllib.request.Request(url, headers={'User-Agent': 'Sileo/2.5 APT-HTTP/1.3', 'Cache-Control': 'no-cache'})
                 with urllib.request.urlopen(request, timeout=8) as response:
                     status = response.status
                     actual = response.read(50 * 1024 * 1024)
+                if status != 200:
+                    raise ValueError('HTTP ' + str(status))
                 if url.endswith('/Release'):
-                    validate_release_fields(actual.decode('utf-8'), fields(expected.decode('utf-8'))['Architectures'])
-                if status != 200 or actual != expected:
-                    raise ValueError('HTTP ' + str(status) + ': payload differs from validated artifact')
+                    observed = fields(actual.decode('utf-8'))
+                    wanted = fields(expected.decode('utf-8'))
+                    validate_release_fields(actual.decode('utf-8'), wanted['Architectures'])
+                    # A CDN may retain a previous Date for the SAME package indexes.
+                    # Still require the correct version, architecture and exact hash tables.
+                    for key in ('Origin', 'Label', 'Version', 'Components', 'SHA256', 'SHA512'):
+                        if observed.get(key) != wanted.get(key):
+                            raise ValueError('Release mismatch: ' + key)
+                    return True, '| 200 · Sileo fields and index hashes verified | ' + url + ' |'
+                if actual != expected:
+                    raise ValueError('HTTP 200: payload differs from validated artifact')
                 return True, '| 200 · SHA256 verified | ' + url + ' |'
             except Exception as exc:
                 error = str(exc).replace('|', '/')
-                if attempt < 2:
-                    time.sleep(2)
+                if attempt < 11:
+                    time.sleep(10)
         return False, '| FAILED: ' + error + ' | ' + url + ' |'
 
     results = list(ThreadPoolExecutor(max_workers=8).map(verify, requests))
