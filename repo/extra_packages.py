@@ -1,4 +1,4 @@
-"""Explicitly pinned additional packages; never auto-promote arbitrary prereleases."""
+"""Additional-package hooks; sayadev currently publishes only SelectBlocks."""
 import bz2
 import gzip
 import hashlib
