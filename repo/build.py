@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Publish real release DEBs as three isolated, flat APT channels. Standard library only."""
 import argparse
+import base64
 import bz2
 import datetime
 import email.utils
@@ -68,6 +69,12 @@ def validate_release_fields(text, expected_arch):
 
 
 def png_icon(size=128):
+    custom = Path(__file__).with_name('icon.png.b64')
+    if custom.exists():
+        data = base64.b64decode(custom.read_text().strip(), validate=True)
+        if not data.startswith(b'\x89PNG\r\n\x1a\n'):
+            raise ValueError('Custom repository icon is not PNG')
+        return data
     def chunk(tag, data):
         return struct.pack('!I', len(data)) + tag + data + struct.pack('!I', zlib.crc32(tag + data) & 0xffffffff)
     rows = []
@@ -89,6 +96,9 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
     destination = pool / deb.name
     shutil.copyfile(deb, destination)
     data = destination.read_bytes()
+    icon_data = png_icon()
+    icon_name = 'icon-' + hashlib.sha256(icon_data).hexdigest()[:12] + '.png'
+    (folder / icon_name).write_bytes(icon_data)
     record = dict(meta)
     # These belong to the index; never trust stale values from DEB control data.
     for key in ('Filename', 'Size', 'MD5sum', 'SHA1', 'SHA256', 'SHA512', 'Depiction', 'SileoDepiction', 'Icon'):
@@ -115,6 +125,7 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
         'Date: ' + email.utils.format_datetime(datetime.datetime.now(datetime.timezone.utc), usegmt=True),
         'Architectures: ' + CHANNELS[variant]['arch'],
         'Components: main',
+        'Icon: ' + source_url + icon_name,
         'Description: SelectBlocks ' + CHANNELS[variant]['title'] + ' packages; unsigned metadata over HTTPS',
     ]
     for label, algorithm in [('MD5Sum', 'md5'), ('SHA256', 'sha256'), ('SHA512', 'sha512')]:
@@ -125,8 +136,9 @@ def write_channel(folder, variant, deb, meta, source_url, depiction_url=None):
     release_text = '\n'.join(release) + '\n'
     validate_release_fields(release_text, CHANNELS[variant]['arch'])
     (folder / 'Release').write_text(release_text)
-    (folder / 'CydiaIcon.png').write_bytes(png_icon())
-    return {'variant': variant, 'url': source_url, 'version': meta['Version'], 'depends': meta['Depends'], 'file': source_url + 'pool/' + deb.name}
+    for name in ('CydiaIcon.png', 'CydiaIcon@2x.png', 'CydiaIcon@3x.png'):
+        (folder / name).write_bytes(icon_data)
+    return {'variant': variant, 'url': source_url, 'version': meta['Version'], 'depends': meta['Depends'], 'file': source_url + 'pool/' + deb.name, 'icon': source_url + icon_name}
 
 
 def make_page(config):

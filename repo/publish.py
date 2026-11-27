@@ -52,7 +52,8 @@ with tempfile.TemporaryDirectory(prefix='selectblocks-apt-') as temp:
     for entry in config['entries']:
         folder = site / CHANNELS[entry['variant']]['path']
         package_name = entry['file'].rsplit('/', 1)[1]
-        for name in ('Release', 'Packages', 'Packages.gz', 'pool/' + package_name):
+        icon_name = entry['icon'].rsplit('/', 1)[1]
+        for name in ('Release', 'Packages', 'Packages.gz', 'pool/' + package_name, icon_name):
             requests.append((entry['url'] + name, (folder / name).read_bytes()))
 
     def verify(item):
