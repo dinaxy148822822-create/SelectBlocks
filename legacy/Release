@@ -3,7 +3,7 @@ Label: sayadev
 Suite: stable
 Codename: selectblocks-rootful-legacy
 Version: 1.1.0
-Date: Fri, 27 Nov 2026 18:05:36 GMT
+Date: Fri, 27 Nov 2026 18:45:19 GMT
 Architectures: iphoneos-arm
 Components: main
 Icon: https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/legacy/icon-7c92cd9bb0af.png

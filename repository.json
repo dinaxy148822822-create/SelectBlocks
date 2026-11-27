@@ -32,5 +32,19 @@
       "package_icon": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/package-icon-290af1fe6368.png"
     }
   ],
-  "signed": false
+  "signed": false,
+  "extra_packages": [
+    {
+      "package": "local.wifipilot",
+      "experimental": true,
+      "release": "https://github.com/dinaxy148822822-create/WiFiPilot/releases/tag/v0.1.0",
+      "variant": "rootless",
+      "url": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/",
+      "version": "0.1.0",
+      "depends": "firmware (>= 16.0), firmware (<< 17.0), uikittools",
+      "file": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/pool/WiFiPilot_0.1.0_rootless.deb",
+      "icon": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/icon-7c92cd9bb0af.png",
+      "package_icon": "https://raw.githubusercontent.com/dinaxy148822822-create/selectblocks/apt/wifipilot-icon-e44fa7d83933.png"
+    }
+  ]
 }
