@@ -3,8 +3,9 @@ Label: SelectBlocks Rootful
 Suite: stable
 Codename: selectblocks-rootful
 Version: 1.1.0
-Date: Fri, 27 Nov 2026 17:09:06 GMT
+Date: Fri, 27 Nov 2026 17:13:32 GMT
 Architectures: iphoneos-arm
+Components: main
 Description: SelectBlocks Rootful packages; unsigned metadata over HTTPS
 MD5Sum:
  da610cb254aed5b984f61eecc4244ba2 839 Packages
